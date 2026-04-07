@@ -31,16 +31,16 @@
 
         <main class="grid gap-6 md:grid-cols-2">
             <section class="rounded-2xl bg-slate-50 p-6 opacity-0 translate-y-6 transition duration-700 ease-out" data-animate>
-                <h2 class="text-2xl font-semibold text-slate-900">What you get</h2>
+                <h2 class="text-2xl font-semibold text-slate-900">Apa yang Anda dapatkan</h2>
                 <ul class="mt-4 space-y-3 text-slate-700">
-                    <li class="flex gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span> Clean MVC structure</li>
-                    <li class="flex gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span> Controller, model, and view separation</li>
-                    <li class="flex gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span> Easy extensibility for Edu Share</li>
+                    <li class="flex gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span> Struktur MVC yang bersih</li>
+                    <li class="flex gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span> Pemisahan controller, model, dan view</li>
+                    <li class="flex gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span> Kemudahan ekstensi untuk Edu Share</li>
                 </ul>
             </section>
 
             <section class="rounded-2xl bg-slate-900 p-6 text-white">
-                <h2 class="text-2xl font-semibold">Get started</h2>
+                <h2 class="text-2xl font-semibold">Mulai</h2>
                 <p class="mt-4 leading-7 text-slate-200">Buka `app/Controllers`, `app/Models`, dan `app/Views` untuk menambahkan fitur baru.</p>
                 <div class="mt-6 rounded-2xl bg-slate-800 p-4">
                     <code class="block overflow-x-auto text-sm text-slate-100">/index.php?url=home/about</code>
