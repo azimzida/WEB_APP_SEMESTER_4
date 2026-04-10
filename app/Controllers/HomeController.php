@@ -13,7 +13,7 @@ class HomeController extends Controller
             'message' => $homeModel->getWelcomeMessage(),
         ];
 
-        $this->view('home/index', $data);
+        $this->view('dashboard/index', $data);
     }
 
     public function about()
@@ -25,7 +25,7 @@ class HomeController extends Controller
             'message' => 'Ini adalah halaman Tentang Kami untuk aplikasi Edu Share.',
         ];
 
-        $this->view('home/about', $data);
+        $this->view('dashboard/about', $data);
     }
 
     public function catalog()
@@ -37,6 +37,6 @@ class HomeController extends Controller
             'message' => 'Lihat koleksi materi dan katalog layanan Edu Share di sini.',
         ];
 
-        $this->view('home/index', $data);
+        $this->view('dashboard/index', $data);
     }
 }

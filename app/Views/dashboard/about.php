@@ -22,6 +22,7 @@
                     <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?>
                 </a>
             <?php endforeach; ?>
+                <a href="/index.php?url=auth/login" class="rounded-full px-4 py-2 bg-violet-600 text-white transition hover:bg-violet-700">Login</a>
         </nav>
 
         <header class="mb-8 text-center">
