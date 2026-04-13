@@ -2,6 +2,8 @@
 
 $config = require __DIR__ . '/config/config.php';
 
+session_start();
+
 define('APP_NAME', $config['app_name']);
 define('APP_VERSION', $config['version']);
 

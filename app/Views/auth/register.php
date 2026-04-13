@@ -17,7 +17,7 @@
                 <p class="mt-4 max-w-xl text-lg leading-8 text-slate-600"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
-            <form class="space-y-6">
+            <form method="POST" action="/register" class="space-y-6">
                 <div>
                     <label for="fullname" class="text-sm font-semibold text-slate-700">Nama Lengkap</label>
                     <input id="fullname" name="fullname" type="text" placeholder="Masukan nama lengkap" class="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-900 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-200" />
@@ -41,7 +41,7 @@
                 <button type="submit" class="w-full rounded-full bg-violet-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-700">Sign Up</button>
             </form>
 
-            <p class="text-center text-sm text-slate-600">Sudah punya akun? <a href="/index.php?url=auth/login" class="font-semibold text-violet-600 hover:text-violet-700">Login di sini</a></p>
+            <p class="text-center text-sm text-slate-600">Sudah punya akun? <a href="/login" class="font-semibold text-violet-600 hover:text-violet-700">Login di sini</a></p>
         </div>
 
         <div class="relative hidden lg:block lg:w-1/2">
