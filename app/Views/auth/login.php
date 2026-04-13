@@ -46,12 +46,21 @@
     <div class="relative mx-auto grid min-h-screen max-w-7xl grid-cols-1 lg:grid-cols-[540px_1fr] lg:px-16">
         <div class="flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-0">
             <div class="max-w-xl">
-                <div class="inline-flex items-center gap-3 rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700">
+                <a href="/dashboard" class="inline-flex items-center gap-3 rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-200 transition">
                     <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-600 text-white">E</span>
                     Edu Share
-                </div>
+                </a>
                 <h1 class="mt-8 text-5xl font-extrabold tracking-tight text-slate-900">Selamat datang kembali!</h1>
                 <p class="mt-4 text-lg leading-8 text-slate-600"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
+                <?php if (!empty($errors)): ?>
+                    <div class="mt-6 rounded-3xl border border-rose-200 bg-rose-50 p-4 text-rose-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
 
                 <div class="mt-10 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-200/40">
                     <form method="POST" action="/login" class="space-y-6">

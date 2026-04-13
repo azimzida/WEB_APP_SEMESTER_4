@@ -9,12 +9,21 @@
     <div class="mx-auto flex max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl shadow-violet-200/40 lg:flex-row">
         <div class="flex w-full flex-col gap-8 p-8 sm:p-10 lg:w-1/2 lg:p-14">
             <div>
-                <div class="inline-flex items-center gap-3 rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700">
+                <a href="/dashboard" class="inline-flex items-center gap-3 rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700 hover:bg-violet-200 transition">
                     <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-600 text-white">E</span>
                     Edu Share
-                </div>
+                </a>
                 <h1 class="mt-8 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">Buat akun baru</h1>
                 <p class="mt-4 max-w-xl text-lg leading-8 text-slate-600"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
+                <?php if (!empty($errors)): ?>
+                    <div class="mt-6 rounded-3xl border border-rose-200 bg-rose-50 p-4 text-rose-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <form method="POST" action="/register" class="space-y-6">
