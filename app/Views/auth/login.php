@@ -54,7 +54,7 @@
                 <p class="mt-4 text-lg leading-8 text-slate-600"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
 
                 <div class="mt-10 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-200/40">
-                    <form class="space-y-6">
+                    <form method="POST" action="/login" class="space-y-6">
                         <div>
                             <label for="email" class="text-sm font-semibold text-slate-700">Email</label>
                             <input id="email" name="email" type="email" placeholder="Masukan email" class="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-900 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-200" />
@@ -75,7 +75,7 @@
 
                         <button type="submit" class="w-full rounded-full bg-violet-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-700">Login</button>
 
-                        <p class="text-center text-sm text-slate-600">Belum punya akun? <a href="/index.php?url=auth/register" class="font-semibold text-violet-600 hover:text-violet-700">Register here</a></p>
+                        <p class="text-center text-sm text-slate-600">Belum punya akun? <a href="/register" class="font-semibold text-violet-600 hover:text-violet-700">Register here</a></p>
                     </form>
                 </div>
             </div>

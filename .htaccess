@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Support pretty URLs by forwarding all requests to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Alias shortcuts
+    RewriteRule ^dashboard/?$ index.php?url=home/index [L,QSA]
+    RewriteRule ^login/?$ index.php?url=auth/login [L,QSA]
+    RewriteRule ^register/?$ index.php?url=auth/register [L,QSA]
+    RewriteRule ^logout/?$ index.php?url=auth/logout [L,QSA]
+    RewriteRule ^about/?$ index.php?url=home/about [L,QSA]
+    RewriteRule ^catalog/?$ index.php?url=home/catalog [L,QSA]
+
+    # General front-controller routing
+    RewriteRule ^(.+)$ index.php?url=$1 [L,QSA]
+</IfModule>

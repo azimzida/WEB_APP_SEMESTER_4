@@ -4,6 +4,7 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $session = new SessionManager();
         $homeModel = $this->model('HomeModel');
 
         $data = [
@@ -13,6 +14,13 @@ class HomeController extends Controller
             'message' => $homeModel->getWelcomeMessage(),
         ];
 
+        if (!$session->isLoggedIn()) {
+            $data['message'] = 'You are not logged in yet. Please login or register to access the dashboard.';
+            $this->view('dashboard/guest', $data);
+            return;
+        }
+
+        $data['user'] = $session->getUser();
         $this->view('dashboard/index', $data);
     }
 
