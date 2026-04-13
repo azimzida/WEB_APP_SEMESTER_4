@@ -7,11 +7,15 @@ class HomeController extends Controller
         $session = new SessionManager();
         $homeModel = $this->model('HomeModel');
 
+        $dbStatus = Database::testConnection();
+
         $data = [
             'title' => APP_NAME,
             'name' => APP_NAME,
             'page' => 'beranda',
             'message' => $homeModel->getWelcomeMessage(),
+            'dbStatus' => $dbStatus,
+            'dbStatusMessage' => $dbStatus ? 'Database connected successfully.' : 'Database not connected.',
         ];
 
         if ($session->isLoggedIn()) {

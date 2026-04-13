@@ -3,6 +3,8 @@
 /* @var string $name */
 /* @var string $page */
 /* @var string $message */
+$dbStatus = $dbStatus ?? false;
+$dbStatusMessage = $dbStatusMessage ?? 'Database status unavailable.';
 ?>
 
 <div class="min-h-screen bg-slate-100">
@@ -11,6 +13,9 @@
             <div class="flex items-center gap-3">
                 <div class="flex h-12 w-12 items-center justify-center rounded-3xl bg-violet-500 text-xl font-bold text-white">E</div>
                 <div>
+                    <div class="mb-2 flex items-center">
+                        <span class="h-3 w-3 rounded-full <?= $dbStatus ? 'bg-emerald-500' : 'bg-rose-500' ?>" title="<?= htmlspecialchars($dbStatus ? 'Database connected' : 'Database disconnected', ENT_QUOTES, 'UTF-8') ?>"></span>
+                    </div>
                     <p class="text-sm font-semibold uppercase tracking-[0.3em] text-violet-600">Edu Share</p>
                     <p class="text-xs text-slate-500">Learn easier and more structured</p>
                 </div>
