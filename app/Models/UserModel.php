@@ -47,7 +47,7 @@ class UserModel extends Model
 
     public function updateUser(string $id, array $data): bool
     {
-        $allowed = ['nama', 'email', 'no_telp', 'password', 'role'];
+        $allowed = ['nama', 'email', 'no_telp', 'password', 'role', 'foto_profil'];
         $fields = [];
         $params = ['id' => $id];
 

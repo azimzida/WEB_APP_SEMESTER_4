@@ -21,6 +21,11 @@ class App
         if (isset($url[1]) && method_exists($this->controller, $url[1])) {
             $this->method = $url[1];
             unset($url[1]);
+        } else {
+            $this->controller = 'HomeController';
+            require_once __DIR__ . '/../Controllers/' . $this->controller . '.php';
+            $this->controller = new $this->controller;
+            $this->method = 'notFound';
         }
 
         $this->params = $url ? array_values($url) : [];

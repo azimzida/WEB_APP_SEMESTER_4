@@ -16,6 +16,9 @@
     RewriteRule ^logout/?$ index.php?url=auth/logout [L,QSA]
     RewriteRule ^about/?$ index.php?url=home/about [L,QSA]
     RewriteRule ^catalog/?$ index.php?url=home/catalog [L,QSA]
+    RewriteRule ^profile/upload/?$ index.php?url=home/updatePhoto [L,QSA]
+    RewriteRule ^profile/delete/?$ index.php?url=home/deletePhoto [L,QSA]
+    RewriteRule ^profile/?$ index.php?url=home/profile [L,QSA]
 
     # General front-controller routing
     RewriteRule ^(.+)$ index.php?url=$1 [L,QSA]
