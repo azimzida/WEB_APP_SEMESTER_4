@@ -14,13 +14,10 @@ class HomeController extends Controller
             'message' => $homeModel->getWelcomeMessage(),
         ];
 
-        if (!$session->isLoggedIn()) {
-            $data['message'] = 'You are not logged in yet. Please login or register to access the dashboard.';
-            $this->view('dashboard/guest', $data);
-            return;
+        if ($session->isLoggedIn()) {
+            $data['user'] = $session->getUser();
         }
 
-        $data['user'] = $session->getUser();
         $this->view('dashboard/index', $data);
     }
 
