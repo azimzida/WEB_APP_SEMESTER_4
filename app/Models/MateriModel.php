@@ -82,7 +82,7 @@ class MateriModel extends Model
     }
 
     public function createMaterial(array $data): bool
-    {
+    {   
         $table = 'materi';
         $columns = $this->getTableColumns($table);
 
@@ -94,7 +94,7 @@ class MateriModel extends Model
             'course_id' => ['course_id', 'courseId', 'id_course', 'course'],
             'kategori_id' => ['kategori_id', 'kategoriId', 'category'],
             'tanggal_upload' => ['tanggal_upload', 'created_at', 'uploaded_at'],
-        ];
+        ];  
 
         $insertColumns = [];
         $insertParams = [];
@@ -138,5 +138,22 @@ class MateriModel extends Model
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($insertParams);
+    }
+
+    public function getAllMaterials(): array
+    {
+        $sql = "SELECT m.*, k.nama_kategori FROM materi m LEFT JOIN kategori k ON m.kategori_id = k.kategori_id ORDER BY m.id DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getMaterialById($id): ?array
+    {
+        $sql = "SELECT * FROM materi WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 }

@@ -2,6 +2,8 @@
 
 class HomeController extends Controller
 {
+    private $courseModel;
+
     public function index()
     {
         $homeModel = $this->model('HomeModel');
@@ -45,73 +47,24 @@ class HomeController extends Controller
         $dbStatus = Database::testConnection();
         $courses = [];
         $categories = [];
+        $materials = [];
         $uploadMessage = null;
         $uploadSuccess = null;
 
         if ($dbStatus) {
-            $courseModel = $this->model('CourseModel');
+            if (!isset($this->courseModel)) {
+                $this->courseModel = $this->model('CourseModel');
+            }
             $kategoriModel = $this->model('KategoriModel');
-            $courses = $courseModel->getAllCourses();
+            $materiModel = $this->model('MateriModel');
+            $courses = $this->courseModel->findAll();
             $categories = $kategoriModel->getAllCategories();
+            $materials = $materiModel->getAllMaterials();
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $materiModel = $this->model('MateriModel');
-            $user = $this->getAuthenticatedUser();
-            $courseId = trim($_POST['course_id'] ?? '');
-            $kategoriId = trim($_POST['kategori_id'] ?? '');
-            $title = trim($_POST['title'] ?? '');
-            $description = trim($_POST['description'] ?? '');
-            $file = $_FILES['material_file'] ?? null;
-
-            if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-                $uploadMessage = 'Unggah file gagal. Pastikan file PDF sudah dipilih.';
-                $uploadSuccess = false;
-            } elseif (strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) !== 'pdf') {
-                $uploadMessage = 'Hanya file PDF yang diperbolehkan.';
-                $uploadSuccess = false;
-            } elseif (empty($courseId)) {
-                $uploadMessage = 'Pilih course terlebih dahulu.';
-                $uploadSuccess = false;
-            } elseif (empty($kategoriId)) {
-                $uploadMessage = 'Pilih kategori materi terlebih dahulu.';
-                $uploadSuccess = false;
-            } else {
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_file($finfo, $file['tmp_name']);
-                finfo_close($finfo);
-
-                if ($mimeType !== 'application/pdf') {
-                    $uploadMessage = 'File yang diunggah bukan PDF.';
-                    $uploadSuccess = false;
-                } else {
-                    $fileContents = file_get_contents($file['tmp_name']);
-                    if ($fileContents === false) {
-                        $uploadMessage = 'Gagal membaca file PDF.';
-                        $uploadSuccess = false;
-                    } else {
-                        $insertData = [
-                            'judul' => $title,
-                            'deskripsi' => $description,
-                            'file_materi' => $fileContents,
-                            'user_id' => $user['id'] ?? null,
-                            'course_id' => $courseId,
-                            'kategori_id' => $kategoriId,
-                        ];
-
-                        if ($materiModel->createMaterial($insertData)) {
-                            $uploadMessage = 'Upload materi berhasil disimpan.';
-                            $uploadSuccess = true;
-                            if ($dbStatus) {
-                                $courses = $courseModel->getAllCourses();
-                            }
-                        } else {
-                            $uploadMessage = 'Gagal menyimpan data materi ke database.';
-                            $uploadSuccess = false;
-                        }
-                    }
-                }
-            }
+        if (isset($_GET['uploadMessage'])) {
+            $uploadMessage = trim($_GET['uploadMessage']);
+            $uploadSuccess = isset($_GET['uploadSuccess']) && $_GET['uploadSuccess'] === '1';
         }
 
         $data = [
@@ -124,11 +77,108 @@ class HomeController extends Controller
             'user' => $this->getAuthenticatedUser(),
             'courses' => $courses,
             'categories' => $categories,
+            'materials' => $materials,
             'uploadMessage' => $uploadMessage,
             'uploadSuccess' => $uploadSuccess,
         ];
 
-        $this->view('dashboard/courses', $data);
+        $this->view('dashboard/material', $data);
+    }
+
+    public function storeMaterial()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /home/material');
+            exit;
+        }
+
+        $user = $this->getAuthenticatedUser();
+        if (!$user) {
+            header('Location: /login');
+            exit;
+        }
+
+        $materiModel = $this->model('MateriModel');
+        $courseId = trim($_POST['course_id'] ?? '');
+        $kategoriId = trim($_POST['kategori_id'] ?? '');
+        $title = trim($_POST['title'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+
+        $uploadSuccess = false;
+        $uploadMessage = '';
+        $fileContents = null;
+
+        if (empty($title)) {
+            $uploadMessage = 'Judul materi tidak boleh kosong.';
+        } elseif (empty($courseId)) {
+            $uploadMessage = 'Pilih course terlebih dahulu.';
+        } elseif (empty($kategoriId)) {
+            $uploadMessage = 'Pilih kategori materi terlebih dahulu.';
+        } else {
+            $file = $_FILES['file_materi'] ?? null;
+
+            if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+                $uploadMessage = 'Unggah file gagal. Pastikan file PDF sudah dipilih.';
+            } elseif (strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) !== 'pdf') {
+                $uploadMessage = 'Hanya file PDF yang diperbolehkan.';
+            } else {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($finfo, $file['tmp_name']);
+                finfo_close($finfo);
+
+                if ($mimeType !== 'application/pdf') {
+                    $uploadMessage = 'File yang diunggah bukan PDF.';
+                } else {
+                    $fileContents = file_get_contents($file['tmp_name']);
+                    if ($fileContents === false) {
+                        $uploadMessage = 'Gagal membaca file PDF.';
+                    }
+                }
+            }
+
+            if ($uploadMessage === '') {
+                $insertData = [
+                    'judul' => $title,
+                    'deskripsi' => $description,
+                    'file_materi' => $fileContents,
+                    'user_id' => $user['id'] ?? null,
+                    'course_id' => $courseId,
+                    'kategori_id' => $kategoriId,
+                ];
+
+                if ($materiModel->createMaterial($insertData)) {
+                    $uploadMessage = 'Upload materi berhasil disimpan.';
+                    $uploadSuccess = true;
+                } else {
+                    $uploadMessage = 'Gagal menyimpan data materi ke database.';
+                }
+            }
+        }
+
+        $redirectUrl = '/home/material?uploadMessage=' . rawurlencode($uploadMessage) . '&uploadSuccess=' . ($uploadSuccess ? '1' : '0');
+        header('Location: ' . $redirectUrl);
+        exit;
+    }
+
+    public function previewMaterial($id = null)
+    {
+        if (empty($id)) {
+            header('Location: /home/material');
+            exit;
+        }
+
+        $materiModel = $this->model('MateriModel');
+        $material = $materiModel->getMaterialById($id);
+
+        if (!$material || empty($material['file_materi'])) {
+            header('Location: /home/material');
+            exit;
+        }
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="material.pdf"');
+        echo $material['file_materi'];
+        exit;
     }
 
     private function getAuthenticatedUser(): ?array
@@ -275,4 +325,6 @@ class HomeController extends Controller
         header('Location: /profile');
         exit;
     }
+
+   
 }

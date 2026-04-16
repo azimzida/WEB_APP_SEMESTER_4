@@ -121,7 +121,7 @@ $uploadSuccess = $uploadSuccess ?? false;
                         <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd" d="M8 4a4 4 0 104 4 4 4 0 00-4-4zm-6 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 12z" clip-rule="evenodd" />
                         </svg>
-                        <label for="courseSearch" class="sr-only">Search courses</label>
+                        <label for="courseSearch" class="sr-only">Search materials</label>
                         <input id="courseSearch" type="search" class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" placeholder="Search materi..." />
                     </div>
                 </div>
@@ -191,7 +191,9 @@ $uploadSuccess = $uploadSuccess ?? false;
                                         <?php if ($type === 'pdf' && $materialId !== ''): ?>
                                             <a href="/home/previewMaterial/<?= rawurlencode((string) $materialId) ?>" target="_blank" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Preview PDF</a>
                                         <?php endif; ?>
-                                        <a href="<?= BASEURL ?>/home/view_pdf/<?= $materi['id'] ?>"target="_blank" class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded-full text-sm font-semibold transition inline-block">Detail </a>                                </div>
+                                        <a href="<?= htmlspecialchars($detailUrl, ENT_QUOTES, 'UTF-8') ?>" class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded-full text-sm font-semibold transition inline-block">Detail</a>
+                                    </div>
+                                </div>
                                 <?php if ($uploadedAt): ?>
                                     <p class="mt-3 text-xs text-slate-400">Uploaded on <?= htmlspecialchars($uploadedAt, ENT_QUOTES, 'UTF-8') ?></p>
                                 <?php endif; ?>
@@ -211,73 +213,73 @@ $uploadSuccess = $uploadSuccess ?? false;
                         </div>
                         <button id="closeUploadModal" type="button" class="rounded-full bg-slate-100 px-3 py-2 text-slate-600 transition hover:bg-slate-200">✕</button>
                     </div>
-                   <form action="/home/storeMaterial" class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
-    <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2">
-            <span class="text-sm font-semibold text-slate-700">Course</span>
-            <select name="course_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
-                <option value="">Pilih course...</option>
-                <?php if (!empty($courses)): ?>
-                    <?php foreach ($courses as $c): ?>
-                        <option value="<?= htmlspecialchars($c['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($c['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') ?></option>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <option value="" disabled>Tidak ada course tersedia</option>
-                <?php endif; ?>
-            </select>
-        </label>
-        <label class="space-y-2">
-            <span class="text-sm font-semibold text-slate-700">Category</span>
-            <select name="kategori_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
-                <option value="">Pilih kategori...</option>
-                <?php foreach ($categories as $categoryOption): ?>
-                    <option value="<?= htmlspecialchars($categoryOption['kategori_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($categoryOption['nama_kategori'] ?? $categoryOption['slug'] ?? 'Kategori', ENT_QUOTES, 'UTF-8') ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-    </div>
+                    <form action="/home/storeMaterial" class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <label class="space-y-2">
+                                <span class="text-sm font-semibold text-slate-700">Course</span>
+                                <select name="course_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
+                                    <option value="">Pilih course...</option>
+                                    <?php if (!empty($courses)): ?>
+                                        <?php foreach ($courses as $c): ?>
+                                            <option value="<?= htmlspecialchars($c['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($c['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') ?></option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="" disabled>Tidak ada course tersedia</option>
+                                    <?php endif; ?>
+                                </select>
+                            </label>
+                            <label class="space-y-2">
+                                <span class="text-sm font-semibold text-slate-700">Category</span>
+                                <select name="kategori_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
+                                    <option value="">Pilih kategori...</option>
+                                    <?php foreach ($categories as $categoryOption): ?>
+                                        <option value="<?= htmlspecialchars($categoryOption['kategori_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($categoryOption['nama_kategori'] ?? $categoryOption['slug'] ?? 'Kategori', ENT_QUOTES, 'UTF-8') ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                        </div>
 
-    <label class="space-y-2">
-        <span class="text-sm font-semibold text-slate-700">Judul Materi</span>
-        <input name="title" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Masukkan judul materi..." />
-    </label>
+                        <label class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Judul Materi</span>
+                            <input name="title" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Masukkan judul materi..." />
+                        </label>
 
-    <div class="space-y-2">
-        <span class="text-sm font-semibold text-slate-700">Tipe Konten</span>
-        <div class="flex gap-4">
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="upload_type" value="pdf" checked class="w-4 h-4 text-violet-600">
-                <span class="text-sm text-slate-600">File PDF</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="upload_type" value="video" class="w-4 h-4 text-violet-600">
-                <span class="text-sm text-slate-600">YouTube Link</span>
-            </label>
-        </div>
-    </div>
+                        <div class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Tipe Konten</span>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="upload_type" value="pdf" checked class="w-4 h-4 text-violet-600">
+                                    <span class="text-sm text-slate-600">File PDF</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="upload_type" value="video" class="w-4 h-4 text-violet-600">
+                                    <span class="text-sm text-slate-600">YouTube Link</span>
+                                </label>
+                            </div>
+                        </div>
 
-    <label class="space-y-2">
-        <span class="text-sm font-semibold text-slate-700">Description</span>
-        <textarea name="description" rows="4" class="w-full resize-none rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="A short description..."></textarea>
-    </label>
+                        <label class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Description</span>
+                            <textarea name="description" rows="4" class="w-full resize-none rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="A short description..."></textarea>
+                        </label>
 
-    <div id="pdf-container" class="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-        <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl text-slate-400">📄</div>
-        <p class="text-sm font-semibold text-slate-900">Upload PDF</p>
-        <input name="file_materi" type="file" accept=".pdf" class="mx-auto mt-4 block w-full max-w-xs cursor-pointer text-sm text-slate-700" />
-    </div>
+                        <div id="pdf-container" class="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                            <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl text-slate-400">📄</div>
+                            <p class="text-sm font-semibold text-slate-900">Upload PDF</p>
+                            <input name="file_materi" type="file" accept=".pdf" class="mx-auto mt-4 block w-full max-w-xs cursor-pointer text-sm text-slate-700" />
+                        </div>
 
-    <div id="video-container" class="hidden rounded-[1.5rem] border border-dashed border-violet-300 bg-violet-50 p-6 text-center">
-        <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl text-red-500">▶️</div>
-        <p class="text-sm font-semibold text-slate-900">YouTube Link</p>
-        <input name="link_youtube" type="url" placeholder="https://www.youtube.com/watch?v=..." class="w-full mt-4 rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" />
-    </div>
+                        <div id="video-container" class="hidden rounded-[1.5rem] border border-dashed border-violet-300 bg-violet-50 p-6 text-center">
+                            <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl text-red-500">▶️</div>
+                            <p class="text-sm font-semibold text-slate-900">YouTube Link</p>
+                            <input name="link_youtube" type="url" placeholder="https://www.youtube.com/watch?v=..." class="w-full mt-4 rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" />
+                        </div>
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <button id="cancelUpload" type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
-        <button type="submit" class="rounded-full bg-yellow-400 px-5 py-3 text-sm font-semibold text-white transition hover:bg-yellow-500">Upload Material</button>
-    </div>
-</form>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                            <button id="cancelUpload" type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
+                            <button type="submit" class="rounded-full bg-yellow-400 px-5 py-3 text-sm font-semibold text-white transition hover:bg-yellow-500">Upload Material</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
