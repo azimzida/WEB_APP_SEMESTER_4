@@ -94,7 +94,7 @@ $userPhoto = $user['foto_profil'] ?? null;
                 </div>
             </div>
 
-            <!-- Category Filter + Search -->
+            <!-- Category Filter + Search + Upload -->
             <div class="fade-up delay-2 flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex flex-wrap gap-3">
                     <button class="px-4 py-2 rounded-full bg-orange-400 text-white font-semibold text-sm transition hover:bg-orange-500">All</button>
@@ -102,12 +102,17 @@ $userPhoto = $user['foto_profil'] ?? null;
                     <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">Programming</button>
                     <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">UI/UX Design</button>
                 </div>
-                <div class="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm sm:w-auto">
-                    <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M8 4a4 4 0 104 4 4 4 0 00-4-4zm-6 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 12z" clip-rule="evenodd" />
-                    </svg>
-                    <label for="courseSearch" class="sr-only">Search courses</label>
-                    <input id="courseSearch" type="search" class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" placeholder="Search materi..." />
+                <div class="flex w-full max-w-2xl items-center gap-3 sm:w-auto">
+                    <button id="uploadMaterialButton" type="button" class="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-500">
+                        Upload Material
+                    </button>
+                    <div class="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm sm:w-auto">
+                        <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 104 4 4 4 0 00-4-4zm-6 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 12z" clip-rule="evenodd" />
+                        </svg>
+                        <label for="courseSearch" class="sr-only">Search courses</label>
+                        <input id="courseSearch" type="search" class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" placeholder="Search materi..." />
+                    </div>
                 </div>
             </div>
 
@@ -227,6 +232,51 @@ $userPhoto = $user['foto_profil'] ?? null;
                     </div>
                 </div>
             </div>
+
+            <!-- Upload Modal -->
+            <div id="uploadModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
+                <div class="w-full max-w-2xl overflow-hidden rounded-[2rem] bg-white shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Upload Material</h2>
+                            <p class="mt-1 text-sm text-slate-500">Masukkan informasi dan upload file materi.</p>
+                        </div>
+                        <button id="closeUploadModal" type="button" class="rounded-full bg-slate-100 px-3 py-2 text-slate-600 transition hover:bg-slate-200">✕</button>
+                    </div>
+                    <form class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <label class="space-y-2">
+                                <span class="text-sm font-semibold text-slate-700">Category</span>
+                                <select name="category" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
+                                    <option value="">Select category...</option>
+                                    <option>Data Base</option>
+                                    <option>Programming</option>
+                                    <option>UI/UX Design</option>
+                                </select>
+                            </label>
+                            <label class="space-y-2">
+                                <span class="text-sm font-semibold text-slate-700">Title</span>
+                                <input name="title" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Enter the title of the material..." />
+                            </label>
+                        </div>
+                        <label class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Description</span>
+                            <textarea name="description" rows="4" class="w-full resize-none rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="A short description or explanation of the material to be uploaded..."></textarea>
+                        </label>
+                        <div class="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+                            <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl text-slate-400">📄</div>
+                            <p class="text-sm font-semibold text-slate-900">Upload PDF</p>
+                            <p class="mt-1 text-sm text-slate-500">Drag & drop pdf files here or click to upload</p>
+                            <input name="material_file" type="file" accept=".pdf" class="mx-auto mt-4 block w-full max-w-xs cursor-pointer text-sm text-slate-700" />
+                            <p class="mt-2 text-xs text-slate-400">File max. 500 MB</p>
+                        </div>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                            <button id="cancelUpload" type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
+                            <button type="submit" class="rounded-full bg-yellow-400 px-5 py-3 text-sm font-semibold text-white transition hover:bg-yellow-500">Upload Material</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
     </div>
 </div>
@@ -235,6 +285,10 @@ $userPhoto = $user['foto_profil'] ?? null;
     (function () {
         var searchInput = document.getElementById('courseSearch');
         var courseCards = document.querySelectorAll('.grid > .pop-in');
+        var uploadButton = document.getElementById('uploadMaterialButton');
+        var uploadModal = document.getElementById('uploadModal');
+        var closeUploadModal = document.getElementById('closeUploadModal');
+        var cancelUpload = document.getElementById('cancelUpload');
 
         function filterCourses() {
             var query = searchInput.value.trim().toLowerCase();
@@ -244,8 +298,40 @@ $userPhoto = $user['foto_profil'] ?? null;
             });
         }
 
+        function openModal() {
+            if (!uploadModal) return;
+            uploadModal.classList.remove('hidden');
+            uploadModal.classList.add('flex');
+        }
+
+        function closeModal() {
+            if (!uploadModal) return;
+            uploadModal.classList.add('hidden');
+            uploadModal.classList.remove('flex');
+        }
+
         if (searchInput) {
             searchInput.addEventListener('input', filterCourses);
+        }
+
+        if (uploadButton) {
+            uploadButton.addEventListener('click', openModal);
+        }
+
+        if (closeUploadModal) {
+            closeUploadModal.addEventListener('click', closeModal);
+        }
+
+        if (cancelUpload) {
+            cancelUpload.addEventListener('click', closeModal);
+        }
+
+        if (uploadModal) {
+            uploadModal.addEventListener('click', function (event) {
+                if (event.target === uploadModal) {
+                    closeModal();
+                }
+            });
         }
     })();
 </script>
