@@ -40,18 +40,92 @@ class HomeController extends Controller
         $this->view('dashboard/about', $data);
     }
 
-    public function courses()
+    public function material()
     {
         $dbStatus = Database::testConnection();
+        $courses = [];
+        $categories = [];
+        $uploadMessage = null;
+        $uploadSuccess = null;
+
+        if ($dbStatus) {
+            $courseModel = $this->model('CourseModel');
+            $kategoriModel = $this->model('KategoriModel');
+            $courses = $courseModel->getAllCourses();
+            $categories = $kategoriModel->getAllCategories();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $materiModel = $this->model('MateriModel');
+            $user = $this->getAuthenticatedUser();
+            $courseId = trim($_POST['course_id'] ?? '');
+            $kategoriId = trim($_POST['kategori_id'] ?? '');
+            $title = trim($_POST['title'] ?? '');
+            $description = trim($_POST['description'] ?? '');
+            $file = $_FILES['material_file'] ?? null;
+
+            if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+                $uploadMessage = 'Unggah file gagal. Pastikan file PDF sudah dipilih.';
+                $uploadSuccess = false;
+            } elseif (strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) !== 'pdf') {
+                $uploadMessage = 'Hanya file PDF yang diperbolehkan.';
+                $uploadSuccess = false;
+            } elseif (empty($courseId)) {
+                $uploadMessage = 'Pilih course terlebih dahulu.';
+                $uploadSuccess = false;
+            } elseif (empty($kategoriId)) {
+                $uploadMessage = 'Pilih kategori materi terlebih dahulu.';
+                $uploadSuccess = false;
+            } else {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($finfo, $file['tmp_name']);
+                finfo_close($finfo);
+
+                if ($mimeType !== 'application/pdf') {
+                    $uploadMessage = 'File yang diunggah bukan PDF.';
+                    $uploadSuccess = false;
+                } else {
+                    $fileContents = file_get_contents($file['tmp_name']);
+                    if ($fileContents === false) {
+                        $uploadMessage = 'Gagal membaca file PDF.';
+                        $uploadSuccess = false;
+                    } else {
+                        $insertData = [
+                            'judul' => $title,
+                            'deskripsi' => $description,
+                            'file_materi' => $fileContents,
+                            'user_id' => $user['id'] ?? null,
+                            'course_id' => $courseId,
+                            'kategori_id' => $kategoriId,
+                        ];
+
+                        if ($materiModel->createMaterial($insertData)) {
+                            $uploadMessage = 'Upload materi berhasil disimpan.';
+                            $uploadSuccess = true;
+                            if ($dbStatus) {
+                                $courses = $courseModel->getAllCourses();
+                            }
+                        } else {
+                            $uploadMessage = 'Gagal menyimpan data materi ke database.';
+                            $uploadSuccess = false;
+                        }
+                    }
+                }
+            }
+        }
 
         $data = [
-            'title' => 'Courses - ' . APP_NAME,
+            'title' => 'Material - ' . APP_NAME,
             'name' => APP_NAME,
-            'page' => 'courses',
-            'message' => 'Ini adalah halaman Courses untuk aplikasi Edu Share.',
+            'page' => 'material',
+            'message' => 'Ini adalah halaman Material untuk aplikasi Edu Share.',
             'dbStatus' => $dbStatus,
             'dbStatusMessage' => $dbStatus ? 'Database connected successfully.' : 'Database not connected.',
             'user' => $this->getAuthenticatedUser(),
+            'courses' => $courses,
+            'categories' => $categories,
+            'uploadMessage' => $uploadMessage,
+            'uploadSuccess' => $uploadSuccess,
         ];
 
         $this->view('dashboard/courses', $data);

@@ -8,6 +8,10 @@ $dbStatusMessage = $dbStatusMessage ?? 'Database status unavailable.';
 $user = $user ?? null;
 $userName = $user['nama'] ?? null;
 $userPhoto = $user['foto_profil'] ?? null;
+$courses = $courses ?? [];
+$categories = $categories ?? [];
+$uploadMessage = $uploadMessage ?? null;
+$uploadSuccess = $uploadSuccess ?? false;
 ?>
 
 <style>
@@ -62,7 +66,7 @@ $userPhoto = $user['foto_profil'] ?? null;
 
             <nav id="nav" class="hidden md:flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                 <a href="/dashboard" class="fade-up delay-2 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Home</a>
-                <a href="/home/courses" class="fade-up delay-3 rounded-full px-4 py-2 bg-violet-600 text-white transition hover:bg-violet-700">Courses</a>
+                <a href="/home/material" class="fade-up delay-3 rounded-full px-4 py-2 bg-violet-600 text-white transition hover:bg-violet-700">Material</a>
                 <a href="/about" class="fade-up delay-4 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
                 <?php if ($user): ?>
                     <div class="ml-4 flex items-center gap-3">
@@ -86,9 +90,15 @@ $userPhoto = $user['foto_profil'] ?? null;
         </header>
 
         <section class="mt-10">
+            <?php if ($uploadMessage !== null): ?>
+                <div class="mb-6 rounded-3xl border px-5 py-4 text-sm font-medium <?= $uploadSuccess ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800' ?>">
+                    <?= htmlspecialchars($uploadMessage, ENT_QUOTES, 'UTF-8') ?>
+                </div>
+            <?php endif; ?>
+
             <div class="fade-up delay-1 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
                 <div>
-                    <p class="text-sm uppercase tracking-[0.3em] text-violet-600">All Courses</p>
+                    <p class="text-sm uppercase tracking-[0.3em] text-violet-600">All Materials</p>
                     <h1 class="mt-3 text-3xl font-extrabold text-slate-900">Share Learning Materials More Easily</h1>
                     <p class="mt-2 text-slate-600">The best place to share and find college study materials.</p>
                 </div>
@@ -118,119 +128,64 @@ $userPhoto = $user['foto_profil'] ?? null;
 
             <!-- Course Cards Grid -->
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <!-- SQL Basics Card -->
-                <div class="pop-in delay-1 rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                    <div class="h-32 bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                        <span class="text-5xl text-cyan-900 relative z-10">💾</span>
+                <?php if (empty($courses)): ?>
+                    <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
+                        <h2 class="text-2xl font-bold text-slate-900">Belum ada materi tersedia</h2>
+                        <p class="mt-3 text-slate-600">Silakan tambah materi di database terlebih dahulu, lalu muat ulang halaman ini.</p>
                     </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="inline-block px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-semibold rounded-full">Data Base</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">SQL Basics</h3>
-                        <p class="mt-2 text-sm text-slate-600">Learn SQL fundamentals and database management</p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <a href="#" class="flex-1 py-2 rounded-lg bg-orange-400 text-white font-semibold text-center text-sm transition hover:bg-orange-500">Detail</a>
-                            <button class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">⬇</button>
-                        </div>
-                    </div>
-                </div>
+                <?php else: ?>
+                    <?php foreach ($courses as $course): ?>
+                        <?php
+                            $courseTitle = $course['title'] ?? 'Untitled Course';
+                            $courseCategory = $course['category'] ?? 'General';
+                            $courseDescription = $course['description'] ?? '';
+                            $courseCount = (int) ($course['materi_count'] ?? 0);
+                            $courseId = isset($course['id']) ? rawurlencode((string) $course['id']) : '';
+                            $detailUrl = $courseId !== '' ? '/course/' . $courseId : '#';
 
-                <!-- UI Design Card -->
-                <div class="pop-in delay-2 rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                    <div class="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                        <span class="text-5xl text-purple-900 relative z-10">🎨</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">UI/UX Design</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">Basic UI Design</h3>
-                        <p class="mt-2 text-sm text-slate-600">Master the principles of user interface design</p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <a href="#" class="flex-1 py-2 rounded-lg bg-orange-400 text-white font-semibold text-center text-sm transition hover:bg-orange-500">Detail</a>
-                            <button class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">⬇</button>
-                        </div>
-                    </div>
-                </div>
+                            $gradientClass = 'from-amber-400 to-amber-600';
+                            $badgeBg = 'bg-amber-100';
+                            $badgeText = 'text-amber-700';
+                            $icon = '📚';
 
-                <!-- HTML & CSS Card -->
-                <div class="pop-in delay-3 rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                    <div class="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                        <span class="text-5xl text-blue-900 relative z-10">💻</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">Programming</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">Basic HTML & CSS</h3>
-                        <p class="mt-2 text-sm text-slate-600">Build responsive web pages from scratch</p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <a href="#" class="flex-1 py-2 rounded-lg bg-orange-400 text-white font-semibold text-center text-sm transition hover:bg-orange-500">Detail</a>
-                            <button class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">⬇</button>
-                        </div>
-                    </div>
-                </div>
+                            $categoryKey = strtolower(trim($courseCategory));
+                            if (in_array($categoryKey, ['data base', 'database'], true)) {
+                                $gradientClass = 'from-cyan-400 to-cyan-600';
+                                $badgeBg = 'bg-cyan-100';
+                                $badgeText = 'text-cyan-700';
+                                $icon = '💾';
+                            } elseif (in_array($categoryKey, ['programming', 'code', 'pemrograman'], true)) {
+                                $gradientClass = 'from-blue-400 to-blue-600';
+                                $badgeBg = 'bg-blue-100';
+                                $badgeText = 'text-blue-700';
+                                $icon = '💻';
+                            } elseif (in_array($categoryKey, ['ui/ux design', 'ui/ux', 'design'], true)) {
+                                $gradientClass = 'from-purple-400 to-purple-600';
+                                $badgeBg = 'bg-purple-100';
+                                $badgeText = 'text-purple-700';
+                                $icon = '🎨';
+                            }
+                        ?>
 
-                <!-- CRUD Guide Card -->
-                <div class="pop-in delay-4 rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                    <div class="h-32 bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                        <span class="text-5xl text-rose-900 relative z-10">📝</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="inline-block px-3 py-1 bg-rose-100 text-rose-700 text-xs font-semibold rounded-full">Programming</span>
+                        <div class="pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
+                            <div class="h-32 bg-gradient-to-br <?= $gradientClass ?> flex items-center justify-center relative overflow-hidden">
+                                <div class="absolute inset-0 opacity-10 bg-pattern"></div>
+                                <span class="text-5xl relative z-10"><?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold <?= $badgeBg ?> <?= $badgeText ?>"><?= htmlspecialchars($courseCategory, ENT_QUOTES, 'UTF-8') ?></span>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-900"><?= htmlspecialchars($courseTitle, ENT_QUOTES, 'UTF-8') ?></h3>
+                                <p class="mt-2 text-sm text-slate-600"><?= htmlspecialchars($courseDescription ?: 'Deskripsi belum tersedia.', ENT_QUOTES, 'UTF-8') ?></p>
+                                <div class="mt-4 flex items-center justify-between gap-2">
+                                    <span class="text-sm font-medium text-slate-500"><?= $courseCount ?> materi</span>
+                                    <a href="<?= htmlspecialchars($detailUrl, ENT_QUOTES, 'UTF-8') ?>" class="rounded-lg bg-orange-400 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-500">Detail</a>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900">CRUD Guide</h3>
-                        <p class="mt-2 text-sm text-slate-600">Complete guide to Create, Read, Update, Delete operations</p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <a href="#" class="flex-1 py-2 rounded-lg bg-orange-400 text-white font-semibold text-center text-sm transition hover:bg-orange-500">Detail</a>
-                            <button class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">⬇</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Relational Database Card -->
-                <div class="pop-in delay-5 rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                    <div class="h-32 bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                        <span class="text-5xl text-amber-900 relative z-10">🗄️</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">Data Base</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">Relational Database</h3>
-                        <p class="mt-2 text-sm text-slate-600">Understanding relationships and constraints in databases</p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <a href="#" class="flex-1 py-2 rounded-lg bg-orange-400 text-white font-semibold text-center text-sm transition hover:bg-orange-500">Detail</a>
-                            <button class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">⬇</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- JavaScript Basics Card -->
-                <div class="pop-in delay-6 rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                    <div class="h-32 bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                        <span class="text-5xl text-teal-900 relative z-10">⚡</span>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-teal-100 text-teal-700 text-xs font-semibold rounded-full">Programming <span class="text-xs bg-orange-400 text-white px-2 py-0.5 rounded-full">NEW</span></span>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900">JavaScript Basics</h3>
-                        <p class="mt-2 text-sm text-slate-600">Learn JavaScript fundamentals and DOM manipulation</p>
-                        <div class="mt-4 flex items-center gap-2">
-                            <a href="#" class="flex-1 py-2 rounded-lg bg-orange-400 text-white font-semibold text-center text-sm transition hover:bg-orange-500">Detail</a>
-                            <button class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">⬇</button>
-                        </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
             <!-- Upload Modal -->
@@ -243,20 +198,25 @@ $userPhoto = $user['foto_profil'] ?? null;
                         </div>
                         <button id="closeUploadModal" type="button" class="rounded-full bg-slate-100 px-3 py-2 text-slate-600 transition hover:bg-slate-200">✕</button>
                     </div>
-                    <form class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
+                    <form action="/home/material" class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Category</span>
-                                <select name="category" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
-                                    <option value="">Select category...</option>
-                                    <option>Data Base</option>
-                                    <option>Programming</option>
-                                    <option>UI/UX Design</option>
+                                <span class="text-sm font-semibold text-slate-700">Course</span>
+                                <select name="course_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
+                                    <option value="">Pilih course...</option>
+                                    <?php foreach ($courses as $courseOption): ?>
+                                        <option value="<?= htmlspecialchars($courseOption['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($courseOption['title'] ?? $courseOption['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </label>
                             <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Title</span>
-                                <input name="title" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Enter the title of the material..." />
+                                <span class="text-sm font-semibold text-slate-700">Category</span>
+                                <select name="kategori_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
+                                    <option value="">Pilih kategori...</option>
+                                    <?php foreach ($categories as $categoryOption): ?>
+                                        <option value="<?= htmlspecialchars($categoryOption['kategori_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($categoryOption['nama_kategori'] ?? $categoryOption['slug'] ?? 'Kategori', ENT_QUOTES, 'UTF-8') ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </label>
                         </div>
                         <label class="space-y-2">

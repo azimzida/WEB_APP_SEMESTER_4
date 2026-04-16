@@ -62,7 +62,7 @@ $userPhoto = $user['foto_profil'] ?? null;
 
             <nav id="nav" class="hidden md:flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                 <a href="/dashboard" class="fade-up delay-2 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Home</a>
-                <a href="/home/courses" class="fade-up delay-3 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Courses</a>
+                <a href="/home/material" class="fade-up delay-3 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Material</a>
                 <a href="/about" class="fade-up delay-4 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
                 <?php if ($user): ?>
                     <div class="ml-4 flex items-center gap-3">
@@ -92,7 +92,7 @@ $userPhoto = $user['foto_profil'] ?? null;
                 <p class="fade-up delay-5 max-w-2xl text-lg leading-8 text-slate-600"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
 
                 <div class="fade-up delay-5 flex flex-col gap-4 sm:flex-row">
-                    <a href="#courses" class="inline-flex items-center justify-center rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-700">View Courses</a>
+                    <a href="#material" class="inline-flex items-center justify-center rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition hover:bg-violet-700">View Material</a>
                     <a href="/about" class="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">About Us</a>
                 </div>
 
