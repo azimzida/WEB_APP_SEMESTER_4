@@ -40,6 +40,23 @@ class HomeController extends Controller
         $this->view('dashboard/about', $data);
     }
 
+    public function courses()
+    {
+        $dbStatus = Database::testConnection();
+
+        $data = [
+            'title' => 'Courses - ' . APP_NAME,
+            'name' => APP_NAME,
+            'page' => 'courses',
+            'message' => 'Ini adalah halaman Courses untuk aplikasi Edu Share.',
+            'dbStatus' => $dbStatus,
+            'dbStatusMessage' => $dbStatus ? 'Database connected successfully.' : 'Database not connected.',
+            'user' => $this->getAuthenticatedUser(),
+        ];
+
+        $this->view('dashboard/courses', $data);
+    }
+
     private function getAuthenticatedUser(): ?array
     {
         $session = new SessionManager();

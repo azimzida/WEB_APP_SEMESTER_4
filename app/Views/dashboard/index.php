@@ -62,7 +62,8 @@ $userPhoto = $user['foto_profil'] ?? null;
 
             <nav id="nav" class="hidden md:flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                 <a href="/dashboard" class="fade-up delay-2 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Home</a>
-                <a href="/about" class="fade-up delay-3 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
+                <a href="/home/courses" class="fade-up delay-3 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Courses</a>
+                <a href="/about" class="fade-up delay-4 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
                 <?php if ($user): ?>
                     <div class="ml-4 flex items-center gap-3">
                         <a href="/profile" class="flex items-center gap-3 rounded-full bg-slate-100 text-slate-900 transition hover:bg-slate-200 px-3 py-2">
@@ -142,30 +143,7 @@ $userPhoto = $user['foto_profil'] ?? null;
             </div>
         </section>
 
-        <section id="courses" class="mt-12 rounded-[2rem] bg-white p-8 shadow-2xl shadow-slate-200/20">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm uppercase tracking-[0.3em] text-violet-600">My Courses</p>
-                    <h2 class="mt-3 text-2xl font-semibold text-slate-900">Featured Courses</h2>
-                </div>
-                <a href="#" class="rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700">View All</a>
-            </div>
 
-            <div class="mt-8 grid gap-4 sm:grid-cols-3">
-                <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
-                    <p class="text-sm font-semibold text-slate-500">Linux</p>
-                    <p class="mt-3 text-slate-700">Learn basic commands through scripting.</p>
-                </div>
-                <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
-                    <p class="text-sm font-semibold text-slate-500">SQL</p>
-                    <p class="mt-3 text-slate-700">Build queries and manage databases efficiently.</p>
-                </div>
-                <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5">
-                    <p class="text-sm font-semibold text-slate-500">Web Dev</p>
-                    <p class="mt-3 text-slate-700">Create interactive websites using HTML, CSS, and JS.</p>
-                </div>
-            </div>
-        </section>
 
         <section class="mt-12 grid gap-6 lg:grid-cols-3">
             <div class="rounded-[2rem] bg-violet-500 p-6 text-white shadow-2xl shadow-violet-500/20">
