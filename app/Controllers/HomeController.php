@@ -67,6 +67,11 @@ class HomeController extends Controller
             $uploadSuccess = isset($_GET['uploadSuccess']) && $_GET['uploadSuccess'] === '1';
         }
 
+        if (isset($_GET['message'])) {
+            $uploadMessage = trim($_GET['message']);
+            $uploadSuccess = isset($_GET['success']) && $_GET['success'] === '1';
+        }
+
         $data = [
             'title' => 'Material - ' . APP_NAME,
             'name' => APP_NAME,
@@ -323,6 +328,80 @@ class HomeController extends Controller
         $userModel->updateUser($user['id'], ['foto_profil' => null]);
 
         header('Location: /profile');
+        exit;
+    }
+
+    public function storeCourse()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /home/material');
+            exit;
+        }
+
+        $user = $this->getAuthenticatedUser();
+        if (!$user) {
+            header('Location: /login');
+            exit;
+        }
+
+        $courseModel = $this->model('CourseModel');
+        $courseName = trim($_POST['course_name'] ?? '');
+        $courseDescription = trim($_POST['course_description'] ?? '');
+
+        $message = '';
+        $success = false;
+
+        if (empty($courseName)) {
+            $message = 'Nama course tidak boleh kosong.';
+        } else {
+            $courseId = $courseModel->generateId();
+            if ($courseModel->createCourse($courseId, $courseName, $courseDescription, $user['id'])) {
+                $message = 'Course berhasil ditambahkan.';
+                $success = true;
+            } else {
+                $message = 'Gagal menambahkan course.';
+            }
+        }
+
+        $redirectUrl = '/home/material?message=' . rawurlencode($message) . '&success=' . ($success ? '1' : '0');
+        header('Location: ' . $redirectUrl);
+        exit;
+    }
+
+    public function storeCategory()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /home/material');
+            exit;
+        }
+
+        $user = $this->getAuthenticatedUser();
+        if (!$user) {
+            header('Location: /login');
+            exit;
+        }
+
+        $kategoriModel = $this->model('KategoriModel');
+        $categoryName = trim($_POST['category_name'] ?? '');
+
+        $message = '';
+        $success = false;
+
+        if (empty($categoryName)) {
+            $message = 'Nama kategori tidak boleh kosong.';
+        } else {
+            $categoryId = $kategoriModel->generateId();
+            $categorySlug = $kategoriModel->generateSlug($categoryName);
+            if ($kategoriModel->createCategory($categoryId, $categoryName, $categorySlug)) {
+                $message = 'Kategori berhasil ditambahkan.';
+                $success = true;
+            } else {
+                $message = 'Gagal menambahkan kategori.';
+            }
+        }
+
+        $redirectUrl = '/home/material?message=' . rawurlencode($message) . '&success=' . ($success ? '1' : '0');
+        header('Location: ' . $redirectUrl);
         exit;
     }
 

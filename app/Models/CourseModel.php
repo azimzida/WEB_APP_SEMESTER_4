@@ -33,4 +33,30 @@ class CourseModel extends Model
     {
         return $this->getAllCourses();
     }
+
+    /**
+     * Membuat course baru
+     */
+    public function createCourse(string $id, string $name, string $description, string $createdBy): bool
+    {
+        try {
+            $stmt = $this->db->prepare('INSERT INTO course (id, nama_course, deskripsi, created_by) VALUES (:id, :nama_course, :deskripsi, :created_by)');
+            return $stmt->execute([
+                'id' => $id,
+                'nama_course' => $name,
+                'deskripsi' => $description,
+                'created_by' => $createdBy,
+            ]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Generate unique ID untuk course
+     */
+    public function generateId(): string
+    {
+        return bin2hex(random_bytes(10));
+    }
 }

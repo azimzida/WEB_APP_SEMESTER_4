@@ -113,9 +113,15 @@ $uploadSuccess = $uploadSuccess ?? false;
                     <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">Programming</button>
                     <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">UI/UX Design</button>
                 </div>
-                <div class="flex w-full max-w-2xl items-center gap-3 sm:w-auto">
+                <div class="flex w-full max-w-2xl items-center gap-3 sm:w-auto flex-wrap">
                     <button id="uploadMaterialButton" type="button" class="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-500">
                         Upload Material
+                    </button>
+                    <button id="addCourseButton" type="button" class="inline-flex items-center gap-2 rounded-full bg-violet-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-600">
+                        + Course
+                    </button>
+                    <button id="addCategoryButton" type="button" class="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600">
+                        + Category
                     </button>
                     <div class="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm sm:w-auto">
                         <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -282,6 +288,59 @@ $uploadSuccess = $uploadSuccess ?? false;
                     </form>
                 </div>
             </div>
+
+            <!-- Add Course Modal -->
+            <div id="courseModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
+                <div class="w-full max-w-lg rounded-[2rem] bg-white shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Tambah Course</h2>
+                            <p class="mt-1 text-sm text-slate-500">Buat course baru untuk materi pembelajaran.</p>
+                        </div>
+                        <button id="closeCourseModal" type="button" class="ml-4 flex-shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus:outline-none" aria-label="Close modal">✕</button>
+                    </div>
+                    <form action="/home/storeCourse" class="space-y-4 px-6 py-6" method="post">
+                        <label class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Nama Course</span>
+                            <input name="course_name" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Masukkan nama course..." required />
+                        </label>
+
+                        <label class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Deskripsi (Opsional)</span>
+                            <textarea name="course_description" rows="3" class="w-full resize-none rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Deskripsi singkat tentang course..."></textarea>
+                        </label>
+
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                            <button id="cancelCourse" type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Batal</button>
+                            <button type="submit" class="rounded-full bg-violet-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-600">Tambah Course</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Add Category Modal -->
+            <div id="categoryModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
+                <div class="w-full max-w-lg rounded-[2rem] bg-white shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Tambah Kategori</h2>
+                            <p class="mt-1 text-sm text-slate-500">Buat kategori baru untuk mengorganisir materi.</p>
+                        </div>
+                        <button id="closeCategoryModal" type="button" class="ml-4 flex-shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus:outline-none" aria-label="Close modal">✕</button>
+                    </div>
+                    <form action="/home/storeCategory" class="space-y-4 px-6 py-6" method="post">
+                        <label class="space-y-2">
+                            <span class="text-sm font-semibold text-slate-700">Nama Kategori</span>
+                            <input name="category_name" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Masukkan nama kategori..." required />
+                        </label>
+
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                            <button id="cancelCategory" type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Batal</button>
+                            <button type="submit" class="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600">Tambah Kategori</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
     </div>
 </div>
@@ -292,6 +351,14 @@ $uploadSuccess = $uploadSuccess ?? false;
         const closeUploadModal = document.getElementById('closeUploadModal');
         const cancelUpload = document.getElementById('cancelUpload');
         const uploadButton = document.getElementById('uploadMaterialButton');
+        const courseModal = document.getElementById('courseModal');
+        const closeCourseModal = document.getElementById('closeCourseModal');
+        const cancelCourse = document.getElementById('cancelCourse');
+        const addCourseButton = document.getElementById('addCourseButton');
+        const categoryModal = document.getElementById('categoryModal');
+        const closeCategoryModal = document.getElementById('closeCategoryModal');
+        const cancelCategory = document.getElementById('cancelCategory');
+        const addCategoryButton = document.getElementById('addCategoryButton');
         const searchInput = document.querySelector('#courseSearch');
         const cardsGrid = document.querySelector('.grid.gap-6');
         const radioType = document.querySelectorAll('input[name="upload_type"]');
@@ -361,6 +428,76 @@ $uploadSuccess = $uploadSuccess ?? false;
             uploadModal.addEventListener('click', function (event) {
                 if (event.target === uploadModal) {
                     closeModal();
+                }
+            });
+        }
+
+        // Course modal handlers
+        function openCourseModal() {
+            if (!courseModal) return;
+            const form = courseModal.querySelector('form');
+            if (form) form.reset();
+            courseModal.classList.remove('hidden');
+            courseModal.classList.add('flex');
+        }
+
+        function closeCourseModalFn() {
+            if (!courseModal) return;
+            courseModal.classList.add('hidden');
+            courseModal.classList.remove('flex');
+        }
+
+        if (addCourseButton) {
+            addCourseButton.addEventListener('click', openCourseModal);
+        }
+
+        if (closeCourseModal) {
+            closeCourseModal.addEventListener('click', closeCourseModalFn);
+        }
+
+        if (cancelCourse) {
+            cancelCourse.addEventListener('click', closeCourseModalFn);
+        }
+
+        if (courseModal) {
+            courseModal.addEventListener('click', function (event) {
+                if (event.target === courseModal) {
+                    closeCourseModalFn();
+                }
+            });
+        }
+
+        // Category modal handlers
+        function openCategoryModal() {
+            if (!categoryModal) return;
+            const form = categoryModal.querySelector('form');
+            if (form) form.reset();
+            categoryModal.classList.remove('hidden');
+            categoryModal.classList.add('flex');
+        }
+
+        function closeCategoryModalFn() {
+            if (!categoryModal) return;
+            categoryModal.classList.add('hidden');
+            categoryModal.classList.remove('flex');
+        }
+
+        if (addCategoryButton) {
+            addCategoryButton.addEventListener('click', openCategoryModal);
+        }
+
+        if (closeCategoryModal) {
+            closeCategoryModal.addEventListener('click', closeCategoryModalFn);
+        }
+
+        if (cancelCategory) {
+            cancelCategory.addEventListener('click', closeCategoryModalFn);
+        }
+
+        if (categoryModal) {
+            categoryModal.addEventListener('click', function (event) {
+                if (event.target === categoryModal) {
+                    closeCategoryModalFn();
                 }
             });
         }

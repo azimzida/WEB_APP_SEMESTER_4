@@ -10,21 +10,38 @@ class Database
             return self::$connection;
         }
 
-        $config = require __DIR__ . '/../config/config.php';
-
-        $host = $config['db_host'] ?? '98p348.h.filess.io';
-        $port = $config['db_port'] ?? 3307;
-        $name = $config['db_name'] ?? 'EDUSHARE_personroof';
-        $user = $config['db_user'] ?? 'EDUSHARE_personroof';
-        $pass = $config['db_pass'] ?? '26d74fd1cdbba712d3dc22db693849d46783519e';
+        $host = '127.0.0.1';
+        $port = 3306;
+        $name = 'edushare';
+        $user = 'root';
+        $pass = '';
 
         $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $host, $port, $name);
 
-        $pdo = new PDO($dsn, $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]);
+        try {
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
+        } catch (PDOException $e) {
+            if ($e->getCode() === 1049) {
+                $dsnNoDb = sprintf('mysql:host=%s;port=%d;charset=utf8mb4', $host, $port);
+                $pdo = new PDO($dsnNoDb, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]);
+                $pdo->exec(sprintf('CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci', $name));
+                $pdo = new PDO($dsn, $user, $pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]);
+            } else {
+                throw $e;
+            }
+        }
 
         self::$connection = $pdo;
         return self::$connection;

@@ -1,11 +1,9 @@
 <?php
 
-$config = require __DIR__ . '/config/config.php';
-
 session_start();
 
-define('APP_NAME', $config['app_name']);
-define('APP_VERSION', $config['version']);
+define('APP_NAME', 'Edu Share');
+define('APP_VERSION', '1.0');
 
 spl_autoload_register(function ($class) {
     $paths = [

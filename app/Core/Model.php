@@ -2,10 +2,8 @@
 
 class Model
 {
-    protected $config;
-
     public function __construct()
     {
-        $this->config = require __DIR__ . '/../config/config.php';
+        // Base model constructor for child models.
     }
 }
