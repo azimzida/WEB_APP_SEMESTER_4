@@ -367,6 +367,14 @@ composer dump-autoload
 
 [![GitHub](https://img.shields.io/badge/GitHub-azimzida-181717?style=for-the-badge&logo=github)](https://github.com/azimzida)
 
+**fawwaz1024**
+
+[![GitHub](https://img.shields.io/badge/GitHub-fawwaz1024-181717?style=for-the-badge&logo=github)](https://github.com/fawwaz1024)
+
+**melindacitra09**
+
+[![GitHub](https://img.shields.io/badge/GitHub-melindacitra09-181717?style=for-the-badge&logo=github)](https://github.com/melindacitra09)
+
 </div>
 
 ---
