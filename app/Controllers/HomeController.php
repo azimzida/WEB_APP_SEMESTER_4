@@ -1,5 +1,11 @@
 <?php
 
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Core\Database;
+use App\Core\SessionManager;
+
 class HomeController extends Controller
 {
     private $courseModel;

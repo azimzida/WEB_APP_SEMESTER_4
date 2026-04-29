@@ -1,5 +1,12 @@
 <?php
 
+namespace App\Models;
+
+use App\Core\Model;
+use App\Core\Database;
+use PDO;
+use PDOException;
+
 class CourseModel extends Model
 {
     private PDO $db;

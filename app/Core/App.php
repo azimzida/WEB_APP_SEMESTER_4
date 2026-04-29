@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Core;
+
 class App
 {
     protected $controller = 'HomeController';
@@ -11,21 +13,24 @@ class App
         $url = $this->parseUrl();
 
         if (isset($url[0]) && file_exists(__DIR__ . '/../Controllers/' . ucwords($url[0]) . 'Controller.php')) {
-            $this->controller = ucwords($url[0]) . 'Controller';
+            $this->controller = 'App\\Controllers\\' . ucwords($url[0]) . 'Controller';
             unset($url[0]);
+        } else {
+            $this->controller = 'App\\Controllers\\HomeController';
         }
 
-        require_once __DIR__ . '/../Controllers/' . $this->controller . '.php';
-        $this->controller = new $this->controller;
+        if (class_exists($this->controller)) {
+            $this->controller = new $this->controller;
+        } else {
+            $this->controller = new \App\Controllers\HomeController();
+            $this->method = 'notFound';
+        }
 
         if (isset($url[1]) && method_exists($this->controller, $url[1])) {
             $this->method = $url[1];
             unset($url[1]);
         } else {
-            $this->controller = 'HomeController';
-            require_once __DIR__ . '/../Controllers/' . $this->controller . '.php';
-            $this->controller = new $this->controller;
-            $this->method = 'notFound';
+            $this->method = 'index';
         }
 
         $this->params = $url ? array_values($url) : [];

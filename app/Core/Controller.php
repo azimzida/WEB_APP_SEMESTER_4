@@ -1,11 +1,16 @@
 <?php
 
+namespace App\Core;
+
 class Controller
 {
     protected function model($model)
     {
-        require_once __DIR__ . '/../Models/' . $model . '.php';
-        return new $model;
+        $modelClass = 'App\\Models\\' . $model;
+        if (class_exists($modelClass)) {
+            return new $modelClass;
+        }
+        throw new \Exception("Model {$model} not found");
     }
 
     protected function view($view, $data = [])

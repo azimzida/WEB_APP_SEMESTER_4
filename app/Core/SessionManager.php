@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Core;
+
 class SessionManager
 {
     public function __construct()

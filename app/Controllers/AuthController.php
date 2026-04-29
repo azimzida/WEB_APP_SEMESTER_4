@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Core\SessionManager;
+
 class AuthController extends Controller
 {
     public function login()
