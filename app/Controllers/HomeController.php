@@ -134,9 +134,19 @@ class HomeController extends Controller
                 if ($mimeType !== 'application/pdf') {
                     $uploadMessage = 'File yang diunggah bukan PDF.';
                 } else {
-                    $fileContents = file_get_contents($file['tmp_name']);
-                    if ($fileContents === false) {
-                        $uploadMessage = 'Gagal membaca file PDF.';
+                    $uploadDir = dirname(__DIR__, 2) . '/uploads/materials';
+                    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+                        $uploadMessage = 'Gagal membuat folder penyimpanan file.';
+                    } else {
+                        $safeName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', basename($file['name']));
+                        $targetName = uniqid('material_', true) . '_' . $safeName;
+                        $destination = $uploadDir . '/' . $targetName;
+
+                        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+                            $uploadMessage = 'Gagal menyimpan file PDF.';
+                        } else {
+                            $fileContents = 'uploads/materials/' . $targetName;
+                        }
                     }
                 }
             }
@@ -182,7 +192,16 @@ class HomeController extends Controller
 
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="material.pdf"');
-        echo $material['file_materi'];
+
+        $fileValue = $material['file_materi'];
+        $rootPath = dirname(__DIR__, 2);
+        $filePath = $rootPath . '/' . ltrim(str_replace('\\', '/', $fileValue), '/');
+
+        if (is_string($fileValue) && file_exists($filePath)) {
+            readfile($filePath);
+        } else {
+            echo $fileValue;
+        }
         exit;
     }
 

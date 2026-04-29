@@ -99,19 +99,16 @@ $uploadSuccess = $uploadSuccess ?? false;
 
             <div class="fade-up delay-1 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
                 <div>
-                    <p class="text-sm uppercase tracking-[0.3em] text-violet-600">All Materials</p>
+                    <p class="text-sm uppercase tracking-[0.3em] text-violet-600">All Lists</p>
                     <h1 class="mt-3 text-3xl font-extrabold text-slate-900">Share Learning Materials More Easily</h1>
                     <p class="mt-2 text-slate-600">The best place to share and find college study materials.</p>
                 </div>
             </div>
 
-            <!-- Category Filter + Search + Upload -->
+            <!-- List Selector + Search + Upload -->
             <div class="fade-up delay-2 flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex flex-wrap gap-3">
-                    <button class="px-4 py-2 rounded-full bg-orange-400 text-white font-semibold text-sm transition hover:bg-orange-500">All</button>
-                    <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">Data Base</button>
-                    <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">Programming</button>
-                    <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">UI/UX Design</button>
+                    <button type="button" class="list-tab-button px-4 py-2 rounded-full bg-orange-400 text-white font-semibold text-sm transition hover:bg-orange-500" data-target="listMaterialSection">Material</button>
                 </div>
                 <div class="flex w-full max-w-2xl items-center gap-3 sm:w-auto flex-wrap">
                     <button id="uploadMaterialButton" type="button" class="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-500">
@@ -127,14 +124,15 @@ $uploadSuccess = $uploadSuccess ?? false;
                         <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd" d="M8 4a4 4 0 104 4 4 4 0 00-4-4zm-6 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 12z" clip-rule="evenodd" />
                         </svg>
-                        <label for="courseSearch" class="sr-only">Search materials</label>
-                        <input id="courseSearch" type="search" class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" placeholder="Search materi..." />
+                        <label for="courseSearch" class="sr-only">Search list items</label>
+                        <input id="courseSearch" type="search" class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" placeholder="Search daftar..." />
                     </div>
                 </div>
             </div>
 
             <!-- Material Cards Grid -->
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div id="listMaterialSection" class="list-section">
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <?php if (empty($materials)): ?>
                     <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
                         <h2 class="text-2xl font-bold text-slate-900">Belum ada materi tersedia</h2>
@@ -175,7 +173,7 @@ $uploadSuccess = $uploadSuccess ?? false;
                             }
                         ?>
 
-                        <div class="pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
+                        <div class="list-item pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
                             <div class="h-32 bg-gradient-to-br <?= $gradientClass ?> flex items-center justify-center relative overflow-hidden">
                                 <div class="absolute inset-0 opacity-10 bg-pattern"></div>
                                 <span class="text-5xl relative z-10"><?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?></span>
@@ -209,15 +207,69 @@ $uploadSuccess = $uploadSuccess ?? false;
                 <?php endif; ?>
             </div>
 
+            <div id="listCourseSection" class="list-section hidden">
+                <?php if (empty($courses)): ?>
+                    <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
+                        <h2 class="text-2xl font-bold text-slate-900">Belum ada course tersedia</h2>
+                        <p class="mt-3 text-slate-600">Tambahkan course baru dengan tombol + Course.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <?php foreach ($courses as $course): ?>
+                            <?php
+                                $courseTitle = $course['nama_course'] ?? 'Untitled Course';
+                                $courseDescription = $course['deskripsi'] ?? 'Deskripsi belum tersedia.';
+                            ?>
+                            <div class="list-item pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
+                                <div class="h-32 bg-slate-100 flex items-center justify-center">
+                                    <span class="text-4xl text-violet-500">📚</span>
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-lg font-bold text-slate-900"><?= htmlspecialchars($courseTitle, ENT_QUOTES, 'UTF-8') ?></h3>
+                                    <p class="mt-3 text-sm text-slate-600"><?= htmlspecialchars($courseDescription, ENT_QUOTES, 'UTF-8') ?></p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div id="listCategorySection" class="list-section hidden">
+                <?php if (empty($categories)): ?>
+                    <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
+                        <h2 class="text-2xl font-bold text-slate-900">Belum ada kategori tersedia</h2>
+                        <p class="mt-3 text-slate-600">Tambahkan kategori baru dengan tombol + Category.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <?php foreach ($categories as $category): ?>
+                            <?php
+                                $categoryName = $category['nama_kategori'] ?? 'Kategori';
+                                $categorySlug = $category['slug'] ?? '';
+                            ?>
+                            <div class="list-item pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
+                                <div class="h-32 bg-slate-100 flex items-center justify-center">
+                                    <span class="text-4xl text-emerald-500">🏷️</span>
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-lg font-bold text-slate-900"><?= htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') ?></h3>
+                                    <p class="mt-3 text-sm text-slate-600"><?= htmlspecialchars($categorySlug, ENT_QUOTES, 'UTF-8') ?></p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
             <!-- Upload Modal -->
-            <div id="uploadModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
-                <div class="w-full max-w-2xl overflow-hidden rounded-[2rem] bg-white shadow-2xl">
+            <div id="uploadModal" tabindex="-1" class="fixed inset-0 z-50 hidden items-start sm:items-center justify-center overflow-y-auto bg-slate-900/60 p-4">
+                <div class="w-full max-w-2xl max-h-[calc(100vh-4rem)] overflow-y-auto rounded-[2rem] bg-white shadow-2xl">
                     <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
                         <div>
                             <h2 class="text-xl font-bold text-slate-900">Upload Material</h2>
                             <p class="mt-1 text-sm text-slate-500">Masukkan informasi dan upload file materi.</p>
                         </div>
-                        <button id="closeUploadModal" type="button" class="rounded-full bg-slate-100 px-3 py-2 text-slate-600 transition hover:bg-slate-200">✕</button>
+                        <button id="closeUploadModal" type="button" aria-label="Close upload modal" class="rounded-full bg-slate-100 px-3 py-2 text-slate-600 transition hover:bg-slate-200 focus:outline-none">✕</button>
                     </div>
                     <form action="/home/storeMaterial" class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
                         <div class="grid gap-4 sm:grid-cols-2">
@@ -227,7 +279,8 @@ $uploadSuccess = $uploadSuccess ?? false;
                                     <option value="">Pilih course...</option>
                                     <?php if (!empty($courses)): ?>
                                         <?php foreach ($courses as $c): ?>
-                                            <option value="<?= htmlspecialchars($c['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($c['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') ?></option>
+                                            <?php $courseIdValue = $c['id'] ?? $c['course_id'] ?? ''; ?>
+                                            <option value="<?= htmlspecialchars($courseIdValue, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($c['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') ?></option>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <option value="" disabled>Tidak ada course tersedia</option>
@@ -360,20 +413,45 @@ $uploadSuccess = $uploadSuccess ?? false;
         const cancelCategory = document.getElementById('cancelCategory');
         const addCategoryButton = document.getElementById('addCategoryButton');
         const searchInput = document.querySelector('#courseSearch');
-        const cardsGrid = document.querySelector('.grid.gap-6');
+        const listTabButtons = document.querySelectorAll('.list-tab-button');
+        const listSections = document.querySelectorAll('.list-section');
         const radioType = document.querySelectorAll('input[name="upload_type"]');
         const pdfContainer = document.getElementById('pdf-container');
         const videoContainer = document.getElementById('video-container');
 
-        function filterCourses() {
-            if (!searchInput || !cardsGrid) return;
+        function setActiveListSection(targetId) {
+            listSections.forEach(function (section) {
+                const isActive = section.id === targetId;
+                section.classList.toggle('hidden', !isActive);
+                if (isActive) {
+                    section.querySelectorAll('.list-item').forEach(function (item) {
+                        item.style.display = '';
+                    });
+                }
+            });
+
+            listTabButtons.forEach(function (button) {
+                const isActive = button.dataset.target === targetId;
+                button.classList.toggle('bg-orange-400', isActive);
+                button.classList.toggle('text-white', isActive);
+                button.classList.toggle('bg-slate-200', !isActive);
+                button.classList.toggle('text-slate-700', !isActive);
+            });
+        }
+
+        function filterListItems() {
+            if (!searchInput) return;
 
             const query = searchInput.value.trim().toLowerCase();
-            const cards = Array.from(cardsGrid.children);
+            const activeSection = Array.from(listSections).find(function (section) {
+                return !section.classList.contains('hidden');
+            });
+            if (!activeSection) return;
 
-            cards.forEach(function (card) {
-                const text = card.textContent.toLowerCase();
-                card.style.display = query === '' || text.includes(query) ? '' : 'none';
+            const items = activeSection.querySelectorAll('.list-item');
+            items.forEach(function (item) {
+                const text = item.textContent.toLowerCase();
+                item.style.display = query === '' || text.includes(query) ? '' : 'none';
             });
         }
 
@@ -400,6 +478,7 @@ $uploadSuccess = $uploadSuccess ?? false;
 
             uploadModal.classList.remove('hidden');
             uploadModal.classList.add('flex');
+            uploadModal.focus();
         }
 
         function closeModal() {
@@ -409,15 +488,28 @@ $uploadSuccess = $uploadSuccess ?? false;
         }
 
         if (searchInput) {
-            searchInput.addEventListener('input', filterCourses);
+            searchInput.addEventListener('input', filterListItems);
         }
+
+        if (listTabButtons.length) {
+            listTabButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    setActiveListSection(button.dataset.target || 'listMaterialSection');
+                });
+            });
+        }
+
+        setActiveListSection('listMaterialSection');
 
         if (uploadButton) {
             uploadButton.addEventListener('click', openModal);
         }
 
         if (closeUploadModal) {
-            closeUploadModal.addEventListener('click', closeModal);
+            closeUploadModal.addEventListener('click', function (event) {
+                event.preventDefault();
+                closeModal();
+            });
         }
 
         if (cancelUpload) {
@@ -427,6 +519,12 @@ $uploadSuccess = $uploadSuccess ?? false;
         if (uploadModal) {
             uploadModal.addEventListener('click', function (event) {
                 if (event.target === uploadModal) {
+                    closeModal();
+                }
+            });
+
+            uploadModal.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
                     closeModal();
                 }
             });

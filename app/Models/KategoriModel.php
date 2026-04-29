@@ -22,9 +22,9 @@ class KategoriModel extends Model
     public function createCategory(string $id, string $name, string $slug): bool
     {
         try {
-            $stmt = $this->db->prepare('INSERT INTO kategori (id, nama_kategori, slug) VALUES (:id, :nama_kategori, :slug)');
+            $stmt = $this->db->prepare('INSERT INTO kategori (kategori_id, nama_kategori, slug) VALUES (:kategori_id, :nama_kategori, :slug)');
             return $stmt->execute([
-                'id' => $id,
+                'kategori_id' => $id,
                 'nama_kategori' => $name,
                 'slug' => $slug,
             ]);
