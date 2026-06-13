@@ -80,8 +80,9 @@ $userPhoto = $user['foto_profil'] ?? null;
                                 <button id="open-photo-modal" type="button" class="inline-flex items-center justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700">Edit Photo</button>
                                 <?php if (!empty($userPhoto)): ?>
                                     <form action="/profile/delete" method="post" class="inline">
-                                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?');" class="inline-flex items-center justify-center rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Delete Photo</button>
-                                    </form>
+                                    <?= csrf_field() ?>
+                                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?');" class="inline-flex items-center justify-center rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Delete Photo</button>
+                                </form>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -131,6 +132,7 @@ $userPhoto = $user['foto_profil'] ?? null;
         </div>
 
         <form id="photo-upload-form" action="/profile/upload" method="post" enctype="multipart/form-data" class="mt-6">
+            <?= csrf_field() ?>
             <label class="block text-sm font-medium text-slate-700">Foto baru</label>
             <input id="photo-input" name="photo" type="file" accept="image/*" required class="mt-2 block w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700" />
 

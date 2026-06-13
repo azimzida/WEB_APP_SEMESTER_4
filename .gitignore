@@ -17,6 +17,8 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+.env.backup
+.env.production
 
 # Uploads
 uploads/*
@@ -25,6 +27,9 @@ uploads/*
 # Cache
 .cache
 cache/
+/.phpunit.cache
+/.codex
+/.cursor/
 
 # Logs
 logs/
@@ -33,3 +38,23 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Node / build artifacts
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/public/fonts-manifest.dev.json
+
+# Storage
+/storage/*.key
+/storage/pail
+
+# Other
+/auth.json
+/legacy_app_backup
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+/.zed
+
