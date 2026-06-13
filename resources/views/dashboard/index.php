@@ -132,7 +132,7 @@ $userName = $user['nama'] ?? null;
                 <a href="/dashboard" class="nav-link-active">Home</a>
                 <a href="/home/courses" class="hover:text-slate-900 transition">Course</a>
                 <a href="/materials/upload" class="hover:text-slate-900 transition">Upload</a>
-                <a href="/about" class="hover:text-slate-900 transition">Download</a>
+                <a href="/download" class="hover:text-slate-900 transition">Download</a>
             </nav>
 
             <div class="flex items-center gap-3">

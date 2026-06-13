@@ -16,372 +16,356 @@ if (isset($categories) && $categories) {
     }
 }
 
-$courseMap = [];
-if (isset($courses) && $courses) {
-    foreach ($courses as $course) {
-        $courseMap[$course->id ?? ''] = $course->nama_course ?? $course->title ?? 'Course';
-    }
+function escape($value) {
+    return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
 ?>
 
 <style>
-    .fade-up {
-        opacity: 0;
-        animation: fadeUp 0.85s ease-out forwards;
+    /* Global Background EduShare */
+    .edu-bg {
+        background-color: #FFFFFF;
     }
-    .fade-up.delay-1 { animation-delay: 0.1s; }
-    .fade-up.delay-2 { animation-delay: 0.2s; }
-    .fade-up.delay-3 { animation-delay: 0.3s; }
-    .fade-up.delay-4 { animation-delay: 0.4s; }
-    .fade-up.delay-5 { animation-delay: 0.5s; }
-    .fade-up.delay-6 { animation-delay: 0.65s; }
-    .pop-in {
-        opacity: 0;
-        transform: scale(0.98);
-        animation: popIn 0.7s ease-out forwards;
-    }
-    .pop-in.delay-1 { animation-delay: 0.15s; }
-    .pop-in.delay-2 { animation-delay: 0.25s; }
-    .pop-in.delay-3 { animation-delay: 0.35s; }
-    .pop-in.delay-4 { animation-delay: 0.45s; }
-    .pop-in.delay-5 { animation-delay: 0.55s; }
 
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(18px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Kustomisasi Sidebar Kiri */
+    .sidebar-container {
+        background: #FFFFFF;
+        border-right: 2px solid #E2E8F0;
     }
-    @keyframes popIn {
-        from { opacity: 0; transform: scale(0.96); }
-        to { opacity: 1; transform: scale(1); }
+
+    .sidebar-item-link {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 24px;
+        font-weight: 600;
+        color: #A0AEC0;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar-item-link:hover, .sidebar-item-link.active {
+        color: #4A4A4A;
+    }
+
+    .sidebar-item-link.active {
+        position: relative;
+    }
+
+    /* Indikator Garis Vertikal Tebal di Kanan Menu Aktif */
+    .sidebar-item-link.active::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 25%;
+        width: 4px;
+        height: 50%;
+        background-color: #2D3748;
+        border-radius: 4px 0 0 4px;
+    }
+
+    /* Navigasi Atas */
+    .nav-top-link {
+        font-weight: 600;
+        color: #A0AEC0;
+        transition: color 0.2s ease;
+        position: relative;
+    }
+
+    .nav-top-link:hover, .nav-top-link.active {
+        color: #2D3748;
+    }
+
+    .nav-top-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -16px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #2D3748;
+        border-radius: 99px;
+    }
+
+    /* Banner Header Atas Kanan */
+    .hero-banner {
+        background: linear-gradient(135deg, #E2D7FF 0%, #F5F0FF 50%, #FFF3FA 100%);
+        border-radius: 24px;
+    }
+
+    /* Filter Kategori Bulat */
+    .btn-filter {
+        background-color: #E2E8F0;
+        color: #718096;
+        font-weight: 600;
+        padding: 8px 24px;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-filter.active, .btn-filter:hover {
+        background-color: #FFC436;
+        color: #FFFFFF;
+    }
+
+    /* Custom Input Search Component */
+    .search-wrapper {
+        border: 1px solid #CBD5E0;
+        border-radius: 10px;
+        background: #FFFFFF;
+    }
+
+    /* Manajemen Warna Gradasi Presisi Untuk Setiap Jenis Card */
+    .card-gradient-database { background: linear-gradient(135deg, #4FA8B7 0%, #76C1CE 100%); }
+    .card-gradient-design { background: linear-gradient(135deg, #7A69CD 0%, #A396EB 100%); }
+    .card-gradient-programming { background: linear-gradient(135deg, #4274CD 0%, #6E97E2 100%); }
+    .card-gradient-php { background: linear-gradient(135deg, #C25D6B 0%, #E08593 100%); }
+    .card-gradient-relational { background: linear-gradient(135deg, #D49C43 0%, #ECC078 100%); }
+    .card-gradient-prototyping { background: linear-gradient(135deg, #3BB092 0%, #63CEB3 100%); }
+
+    /* Default fallback card style */
+    .course-item-card {
+        background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .badge-category {
+        background: rgba(255, 255, 255, 0.25);
+        color: #FFFFFF;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 14px;
+        border-radius: 8px;
+    }
+
+    /* Tombol Kontrol di dalam Card */
+    
+    .btn-card-detail {
+        background-color: #FFC436;
+        color: #FFFFFF;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 8px 32px;
+        border-radius: 10px;
+        transition: opacity 0.2s ease;
+    }
+
+    .btn-card-detail:hover {
+        opacity: 0.9;
+    }
+
+    .btn-card-download {
+        background-color: #718096;
+        color: #FFFFFF;
+        padding: 8px 14px;
+        border-radius: 10px;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-card-download:hover {
+        background-color: #4A5568;
     }
 </style>
 
-<div class="min-h-screen bg-slate-100">
-    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header class="fade-up delay-1 flex flex-col gap-6 rounded-[2rem] bg-white px-6 py-6 shadow-2xl shadow-slate-200/20 lg:flex-row lg:items-center lg:justify-between lg:px-10 lg:py-8">
+<div class="min-h-screen edu-bg flex flex-col">
+    <header class="w-full bg-white border-b border-slate-200 px-8 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-3xl">🎓</span>
+            <span class="text-2xl font-bold tracking-tight text-purple-900" style="color: #4E4260;">Edu Share</span>
+        </div>
+        
+        <nav class="hidden md:flex items-center gap-10 text-base">
+            <a href="/dashboard" class="nav-top-link">Home</a>
+            <a href="/home/courses" class="nav-top-link active">Course</a>
+            <a href="/materials/upload" class="nav-top-link">Upload</a>
+            <a href="/download" class="nav-top-link">Download</a>
+        </nav>
+
+        <div class="flex items-center gap-4">
+            <button class="text-slate-400 text-xl relative">
+                🔔
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
             <div class="flex items-center gap-3">
-                <div class="flex h-12 w-12 items-center justify-center rounded-3xl bg-violet-500 text-xl font-bold text-white">E</div>
-                <div>
-                    <div class="mb-2 flex items-center">
-                        <span class="h-3 w-3 rounded-full <?= $dbStatus ? 'bg-emerald-500' : 'bg-rose-500' ?>" title="<?= htmlspecialchars($dbStatus ? 'Database connected' : 'Database disconnected', ENT_QUOTES, 'UTF-8') ?>"></span>
+                <img src="<?= $userPhoto ? escape($userPhoto) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' ?>" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-purple-200" />
+                <span class="font-bold text-slate-800 text-sm"><?= $userName ? escape($userName) : 'Kim Jennie' ?></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-[260px_1fr]">
+        
+        <aside class="sidebar-container py-8 flex flex-col justify-between min-h-[calc(100vh-80px)]">
+            <div class="space-y-1">
+                <a href="/dashboard" class="sidebar-item-link">
+                    <span class="text-lg">🏠</span> Home
+                </a>
+                <a href="/home/courses" class="sidebar-item-link active">
+                    <span class="text-lg">🗂️</span> Course
+                </a>
+                <a href="/download" class="sidebar-item-link">
+                    <span class="text-lg">📥</span> Download
+                </a>
+                <a href="/profile" class="sidebar-item-link">
+                    <span class="text-lg">👤</span> Profile
+                </a>
+            </div>
+
+            <div class="px-6 space-y-6">
+                <div class="w-full flex justify-center">
+                    <div class="relative p-2 bg-purple-50 rounded-2xl">
+                        <span class="text-6xl">📚</span>
                     </div>
-                    <p class="fade-up delay-2 text-sm font-semibold uppercase tracking-[0.3em] text-violet-600">Edu Share</p>
-                    <p class="fade-up delay-3 text-xs text-slate-500">Learn easier and more structured</p>
+                </div>
+                <a href="/logout" class="w-full block text-center bg-indigo-600 text-white font-semibold text-sm py-3 rounded-xl shadow-lg shadow-indigo-200 transition hover:bg-indigo-700">
+                    Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="p-8 space-y-8">
+            
+            <div class="hero-banner p-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-center min-h-[180px]">
+                <div class="space-y-3 z-10 text-center md:text-left">
+                    <h2 class="text-3xl font-extrabold text-slate-800" style="color: #3B324E;">Share Learning Materials More Easily</h2>
+                    <p class="text-sm font-medium text-slate-500">The best place to share and find college study materials.</p>
+                    <div class="pt-2">
+                        <button id="uploadMaterialButtonTop" type="button" class="bg-[#FFC436] text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition hover:opacity-90">
+                            + Upload Materi
+                        </button>
+                    </div>
+                </div>
+                <div class="hidden md:block pr-6 z-10">
+                    <span class="text-8xl filter drop-shadow-sm">👨‍💻</span>
                 </div>
             </div>
 
-            <div class="md:hidden">
-                <button id="hamburger" class="text-slate-600 text-2xl">☰</button>
-            </div>
-
-            <nav id="nav" class="hidden md:flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
-                <a href="/dashboard" class="fade-up delay-2 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Home</a>
-                <a href="/home/courses" class="fade-up delay-3 rounded-full px-4 py-2 bg-violet-600 text-white transition hover:bg-violet-700">Courses</a>
-                <a href="/about" class="fade-up delay-4 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
-                <?php if ($user): ?>
-                    <div class="ml-4 flex items-center gap-3">
-                        <a href="/profile" class="flex items-center gap-3 rounded-full bg-slate-100 text-slate-900 transition hover:bg-slate-200 px-3 py-2">
-                            <?php if (!empty($userPhoto)): ?>
-                                <img src="<?= htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($userName ?: 'Profile', ENT_QUOTES, 'UTF-8') ?>" class="h-10 w-10 rounded-full object-cover" />
-                            <?php else: ?>
-                                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-sm font-semibold text-white"><?= strtoupper(substr($userName ?? ($user['email'] ?? 'U'), 0, 1)) ?></span>
-                            <?php endif; ?>
-                            <span class="text-sm font-semibold text-slate-900"><?= htmlspecialchars($userName ?? ($user['email'] ?? 'User'), ENT_QUOTES, 'UTF-8') ?></span>
-                        </a>
-                        <a href="/logout" class="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700">Logout</a>
-                    </div>
-                <?php else: ?>
-                    <div class="ml-4 flex flex-wrap items-center gap-2">
-                        <a href="/login" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">Login</a>
-                        <a href="/register" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">Register</a>
-                    </div>
-                <?php endif; ?>
-            </nav>
-        </header>
-
-        <section class="mt-10">
-            <div class="fade-up delay-1 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-                <div>
-                    <p class="text-sm uppercase tracking-[0.3em] text-violet-600">All Courses</p>
-                    <h1 class="mt-3 text-3xl font-extrabold text-slate-900">Share Learning Materials More Easily</h1>
-                    <p class="mt-2 text-slate-600">The best place to share and find college study materials.</p>
-                </div>
-            </div>
-
-            <div class="fade-up delay-2 flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
-                <div class="flex flex-wrap gap-3">
-                    <button class="px-4 py-2 rounded-full bg-orange-400 text-white font-semibold text-sm transition hover:bg-orange-500">All</button>
-                    <?php if (isset($categories) && $categories): ?>
-                        <?php foreach ($categories as $cat): ?>
-                            <button class="px-4 py-2 rounded-full bg-slate-200 text-slate-700 font-semibold text-sm transition hover:bg-slate-300">
-                                <?= htmlspecialchars($cat->nama_kategori ?? $cat->name ?? $cat->nama ?? 'Category', ENT_QUOTES, 'UTF-8') ?>
-                            </button>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+            <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div class="flex flex-wrap gap-2">
+                    <button class="btn-filter active">All</button>
+                    <button class="btn-filter" data-category="database">Data Base</button>
+                    <button class="btn-filter" data-category="programming">Programming</button>
+                    <button class="btn-filter" data-category="design">UI/UX Design</button>
+                    
+                    <?php if (isset($categories) && $categories): foreach ($categories as $cat): ?>
+                        <button class="btn-filter" data-category="<?= escape($cat->kategori_id) ?>">
+                            <?= escape($cat->nama_kategori ?? $cat->name ?? $cat->nama ?? 'Category') ?>
+                        </button>
+                    <?php endforeach; endif; ?>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2">
-                        <button id="openAddCategory" type="button" class="rounded-full bg-indigo-600 px-4 py-2 text-sm text-white">Add Category</button>
-                        <button id="openAddCourse" type="button" class="rounded-full bg-emerald-600 px-4 py-2 text-sm text-white">Add Course</button>
-                    </div>
-
-                    <button id="uploadMaterialButton" type="button" class="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-500">
-                        Upload Material
-                    </button>
-
-                    <div class="flex w-full max-w-md items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm sm:w-auto ml-3">
-                        <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M8 4a4 4 0 104 4 4 4 0 00-4-4zm-6 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 12z" clip-rule="evenodd" />
-                        </svg>
-                        <label for="courseSearch" class="sr-only">Search courses</label>
-                        <input id="courseSearch" type="search" class="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" placeholder="Search materi..." />
-                    </div>
+                <div class="search-wrapper flex items-center gap-3 px-4 py-2 w-full max-w-xs">
+                    <input id="courseSearch" type="text" class="w-full text-sm text-slate-700 bg-transparent outline-none placeholder:text-slate-300" placeholder="Search Materials..." />
+                    <span class="text-slate-400 font-bold text-sm">🔍</span>
                 </div>
-            </div>
+            </section>
 
-            <!-- Uploaded Materials -->
-            <div class="fade-up delay-3 mb-10">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <p class="text-sm uppercase tracking-[0.3em] text-violet-600">Latest Materials</p>
-                        <h2 class="mt-2 text-2xl font-bold text-slate-900">Uploaded Materials</h2>
-                    </div>
-                    <div id="materialsCount" class="text-sm text-slate-500">
-                        <?= isset($materials) && count($materials) > 0 ? count($materials) . ' materials found' : 'No materials uploaded yet' ?>
-                    </div>
-                </div>
+            <section class="space-y-6">
+                <?php if (isset($courses) && $courses && count($courses) > 0): ?>
+                    <div id="courseGrid" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        <?php foreach ($courses as $index => $course): 
+                            // Penentuan otomatis class gradasi warna agar dinamis menyerupai variasi gambar
+                            $cleanTitle = strtolower($course->nama_course ?? $course->title ?? '');
+                            $gradientClass = 'card-gradient-programming'; // Default fallback
 
-                <?php if (isset($materials) && $materials && count($materials) > 0): ?>
-                    <div id="materialsGrid" class="mt-6 grid gap-6 lg:grid-cols-2">
-                        <?php foreach ($materials as $material): ?>
-                            <article class="material-card rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-                                <div class="flex flex-wrap items-center justify-between gap-3">
-                                    <span class="material-meta text-xs uppercase tracking-[0.3em] text-slate-500">
-                                        <?= htmlspecialchars($categoryMap[$material->kategori_id ?? ''] ?? 'Uncategorized', ENT_QUOTES, 'UTF-8') ?>
-                                    </span>
-                                    <span class="text-xs text-slate-400"><?= htmlspecialchars($material->tanggal_upload ?? '', ENT_QUOTES, 'UTF-8') ?></span>
+                            if (strpos($cleanTitle, 'sql') !== false || strpos($cleanTitle, 'base') !== false) {
+                                $gradientClass = 'card-gradient-database';
+                            } elseif (strpos($cleanTitle, 'ui') !== false || strpos($cleanTitle, 'ux') !== false) {
+                                $gradientClass = 'card-gradient-design';
+                            } elseif (strpos($cleanTitle, 'html') !== false || strpos($cleanTitle, 'css') !== false) {
+                                $gradientClass = 'card-gradient-programming';
+                            } elseif (strpos($cleanTitle, 'crud') !== false || strpos($cleanTitle, 'php') !== false) {
+                                $gradientClass = 'card-gradient-php';
+                            } elseif (strpos($cleanTitle, 'relational') !== false) {
+                                $gradientClass = 'card-gradient-relational';
+                            } elseif (strpos($cleanTitle, 'prototype') !== false || strpos($cleanTitle, 'step') !== false) {
+                                $gradientClass = 'card-gradient-prototyping';
+                            }
+                        ?>
+                            <article class="course-item-card <?= $gradientClass ?> flex flex-col justify-between min-h-[190px]">
+                                <div class="p-5 flex justify-between items-start">
+                                    <div class="text-white space-y-2">
+                                        <h3 class="text-xl font-bold tracking-tight">
+                                            <?= escape($course->nama_course ?? $course->title ?? 'Untitled Course') ?>
+                                        </h3>
+                                        <span class="badge-category inline-block">
+                                            <?= escape($categoryMap[$course->kategori_id ?? ''] ?? 'Course Material') ?>
+                                        </span>
+                                    </div>
+                                    <div class="text-4xl opacity-90 filter drop-shadow">
+                                        <?php if(strpos($gradientClass, 'database') !== false || strpos($gradientClass, 'relational') !== false): ?>
+                                            🗄️
+                                        <?php elseif(strpos($gradientClass, 'design') !== false || strpos($gradientClass, 'prototyping') !== false): ?>
+                                            🎨
+                                        <?php else: ?>
+                                            💻
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
 
-                                <h3 class="material-title mt-4 text-xl font-semibold text-slate-900">
-                                    <?= htmlspecialchars($material->judul ?? 'Untitled Material', ENT_QUOTES, 'UTF-8') ?>
-                                </h3>
-
-                                <p class="material-description mt-3 text-sm text-slate-600"><?= nl2br(htmlspecialchars($material->deskripsi ?? '', ENT_QUOTES, 'UTF-8')) ?></p>
-
-                                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                    <a href="<?= htmlspecialchars(asset('storage/' . ($material->file_materi ?? '')), ENT_QUOTES, 'UTF-8') ?>" target="_blank" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">
-                                        Open PDF
+                                <div class="bg-white px-5 py-4 flex items-center justify-between border-t border-slate-50">
+                                    <a href="/course/<?= escape($course->id ?? '') ?>" class="btn-card-detail">
+                                        Detail
                                     </a>
-                                    <span class="material-course text-xs text-slate-400">
-                                        <?= htmlspecialchars(!empty($material->course_id) ? ('Course: ' . ($courseMap[$material->course_id] ?? $material->course_id)) : 'No course', ENT_QUOTES, 'UTF-8') ?>
-                                    </span>
+                                    <button type="button" class="btn-card-download">
+                                        📥
+                                    </button>
                                 </div>
                             </article>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <div class="mt-6 rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
-                        <p class="text-sm text-slate-500">Belum ada materi yang diupload. Upload materi untuk melihat daftar di sini.</p>
+                    <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-12 text-center">
+                        <p class="text-sm text-slate-400 font-medium">Belum ada course yang tersedia saat ini.</p>
                     </div>
                 <?php endif; ?>
-            </div>
+            </section>
 
-            <div id="uploadModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
-                <div class="w-full max-w-2xl overflow-hidden rounded-[2rem] bg-white shadow-2xl">
-                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-900">Upload Material</h2>
-                            <p class="mt-1 text-sm text-slate-500">Masukkan informasi dan upload file materi.</p>
-                        </div>
-                        <button id="closeUploadModal" type="button" class="rounded-full bg-slate-100 px-3 py-2 text-slate-600 transition hover:bg-slate-200">✕</button>
-                    </div>
-
-                    <form action="/materials/upload" class="space-y-5 px-6 py-6" method="post" enctype="multipart/form-data">
-                        <?= csrf_field() ?>
-                        <div class="grid gap-4 sm:grid-cols-3">
-                            <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Category</span>
-                                <select name="category" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
-                                    <option value="">Select category...</option>
-                                    <?php if (isset($categories) && $categories): foreach ($categories as $cat): ?>
-                                        <option value="<?= htmlspecialchars($cat->kategori_id ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                                            <?= htmlspecialchars($cat->nama_kategori ?? $cat->name ?? $cat->nama ?? '', ENT_QUOTES, 'UTF-8') ?>
-                                        </option>
-                                    <?php endforeach; endif; ?>
-                                </select>
-                            </label>
-
-                            <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Course</span>
-                                <select name="course" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
-                                    <option value="">Select course...</option>
-                                    <?php if (isset($courses) && $courses): foreach ($courses as $course): ?>
-                                        <option value="<?= htmlspecialchars($course->id ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                                            <?= htmlspecialchars($course->nama_course ?? $course->title ?? 'Course', ENT_QUOTES, 'UTF-8') ?>
-                                        </option>
-                                    <?php endforeach; endif; ?>
-                                </select>
-                            </label>
-
-                            <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Title</span>
-                                <input name="title" type="text" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="Enter the title of the material..." required />
-                            </label>
-                        </div>
-
-                        <label class="space-y-2">
-                            <span class="text-sm font-semibold text-slate-700">Description</span>
-                            <textarea name="description" rows="4" class="w-full resize-none rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none" placeholder="A short description or explanation of the material to be uploaded..."></textarea>
-                        </label>
-
-                        <div class="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                            <div class="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-3xl text-slate-400">📄</div>
-                            <p class="text-sm font-semibold text-slate-900">Upload PDF</p>
-                            <p class="mt-1 text-sm text-slate-500">Drag & drop pdf files here or click to upload</p>
-                            <input name="material_file" type="file" accept=".pdf" class="mx-auto mt-4 block w-full max-w-xs cursor-pointer text-sm text-slate-700" required />
-                            <p class="mt-2 text-xs text-slate-400">File max. 500 MB</p>
-                        </div>
-
-                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                            <button id="cancelUpload" type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Cancel</button>
-                            <button type="submit" class="rounded-full bg-yellow-400 px-5 py-3 text-sm font-semibold text-white transition hover:bg-yellow-500">Upload Material</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div id="addCategoryModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
-                <div class="bg-white rounded-xl max-w-md w-full p-6">
-                    <h3 class="text-lg font-semibold mb-4">Add Category</h3>
-                    <form action="/kategori/create" method="post" class="space-y-4">
-                        <?= csrf_field() ?>
-                        <input name="name" type="text" placeholder="Category name" class="w-full rounded px-3 py-2 border" required />
-                        <div class="flex justify-end gap-2">
-                            <button type="button" id="closeAddCategory" class="px-4 py-2 border rounded">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div id="addCourseModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4">
-                <div class="bg-white rounded-xl max-w-2xl w-full p-6">
-                    <h3 class="text-lg font-semibold mb-4">Add Course</h3>
-                    <form action="/course/create" method="post" class="grid grid-cols-1 gap-4">
-                        <?= csrf_field() ?>
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Category</span>
-                                <select name="category" class="w-full rounded border px-3 py-2" required>
-                                    <option value="">Select category...</option>
-                                    <?php if (isset($categories) && $categories): foreach ($categories as $cat): ?>
-                                        <option value="<?= htmlspecialchars($cat->kategori_id ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                                            <?= htmlspecialchars($cat->nama_kategori ?? $cat->name ?? $cat->nama ?? '', ENT_QUOTES, 'UTF-8') ?>
-                                        </option>
-                                    <?php endforeach; endif; ?>
-                                </select>
-                            </label>
-
-                            <label class="space-y-2">
-                                <span class="text-sm font-semibold text-slate-700">Title</span>
-                                <input name="title" type="text" placeholder="Course title" class="w-full rounded border px-3 py-2" required />
-                            </label>
-                        </div>
-
-                        <label class="space-y-2">
-                            <span class="text-sm font-semibold text-slate-700">Description</span>
-                            <textarea name="description" rows="4" class="w-full rounded border px-3 py-2" placeholder="Description"></textarea>
-                        </label>
-
-                        <div class="flex justify-end gap-2">
-                            <button type="button" id="closeAddCourse" class="px-4 py-2 border rounded">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded">Save Course</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
+            <footer class="pt-6 flex justify-end gap-3">
+                <button onclick="window.location.reload();" class="p-3 bg-[#E2E8F0] rounded-xl hover:bg-slate-300 transition text-lg">
+                    🔄
+                </button>
+                <a href="/dashboard" class="bg-[#F8A488] text-white font-bold px-6 py-3 rounded-xl shadow-md transition hover:opacity-90">
+                    Back to Home
+                </a>
+            </footer>
+        </main>
     </div>
 </div>
 
 <script>
-    (function () {
-        var uploadButton = document.getElementById('uploadMaterialButton');
-        var uploadModal = document.getElementById('uploadModal');
-        var closeUploadModal = document.getElementById('closeUploadModal');
-        var cancelUpload = document.getElementById('cancelUpload');
-
-        var openAddCategory = document.getElementById('openAddCategory');
-        var addCategoryModal = document.getElementById('addCategoryModal');
-        var closeAddCategory = document.getElementById('closeAddCategory');
-
-        var openAddCourse = document.getElementById('openAddCourse');
-        var addCourseModal = document.getElementById('addCourseModal');
-        var closeAddCourse = document.getElementById('closeAddCourse');
-
-        function open(el) {
-            if (!el) return;
-            el.classList.remove('hidden');
-            el.classList.add('flex');
-        }
-
-        function close(el) {
-            if (!el) return;
-            el.classList.add('hidden');
-            el.classList.remove('flex');
-        }
-
-        uploadButton?.addEventListener('click', function () { open(uploadModal); });
-        closeUploadModal?.addEventListener('click', function () { close(uploadModal); });
-        cancelUpload?.addEventListener('click', function () { close(uploadModal); });
-        uploadModal?.addEventListener('click', function (e) { if (e.target === uploadModal) close(uploadModal); });
-
-        openAddCategory?.addEventListener('click', function () { open(addCategoryModal); });
-        closeAddCategory?.addEventListener('click', function () { close(addCategoryModal); });
-        addCategoryModal?.addEventListener('click', function (e) { if (e.target === addCategoryModal) close(addCategoryModal); });
-
-        openAddCourse?.addEventListener('click', function () { open(addCourseModal); });
-        closeAddCourse?.addEventListener('click', function () { close(addCourseModal); });
-        addCourseModal?.addEventListener('click', function (e) { if (e.target === addCourseModal) close(addCourseModal); });
-    })();
-</script>
-
-<script>
+// Filter interaktif frontend untuk fungsionalitas kotak pencarian & tombol kategori
 (function () {
     var searchInput = document.getElementById('courseSearch');
-    var materialCards = Array.from(document.querySelectorAll('.material-card'));
-    var materialsCount = document.getElementById('materialsCount');
+    var courseCards = Array.from(document.querySelectorAll('#courseGrid > article'));
+    var categoryButtons = Array.from(document.querySelectorAll('.btn-filter'));
+    var activeCategory = '';
 
-    function updateMaterialsCount(count) {
-        if (!materialsCount) return;
-        if (count === 0) {
-            materialsCount.textContent = 'No materials match your search';
-        } else if (count === 1) {
-            materialsCount.textContent = '1 material found';
-        } else {
-            materialsCount.textContent = count + ' materials found';
-        }
-    }
-
-    function filterMaterials() {
+    function filterCourses() {
         var term = searchInput.value.trim().toLowerCase();
-        var visibleCount = 0;
+        courseCards.forEach(function (card) {
+            var title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+            var category = card.querySelector('.badge-category')?.textContent.toLowerCase() || '';
+            
+            var matchesText = !term || title.includes(term) || category.includes(term);
+            var matchesCategory = !activeCategory || category.includes(activeCategory.toLowerCase());
 
-        materialCards.forEach(function(card) {
-            var title = card.querySelector('.material-title')?.textContent.toLowerCase() || '';
-            var description = card.querySelector('.material-description')?.textContent.toLowerCase() || '';
-            var category = card.querySelector('.material-meta')?.textContent.toLowerCase() || '';
-            var course = card.querySelector('.material-course')?.textContent.toLowerCase() || '';
-            var visible = !term || title.includes(term) || description.includes(term) || category.includes(term) || course.includes(term);
-
-            card.style.display = visible ? '' : 'none';
-            if (visible) visibleCount++;
+            card.style.display = matchesText && matchesCategory ? '' : 'none';
         });
-
-        updateMaterialsCount(visibleCount);
     }
 
-    searchInput?.addEventListener('input', filterMaterials);
+    categoryButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            activeCategory = button.textContent.trim() === 'All' ? '' : button.getAttribute('data-category') || button.textContent.trim();
+            categoryButtons.forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            filterCourses();
+        });
+    });
+
+    searchInput?.addEventListener('input', filterCourses);
 })();
 </script>

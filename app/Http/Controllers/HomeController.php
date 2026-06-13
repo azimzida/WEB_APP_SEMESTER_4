@@ -57,6 +57,31 @@ class HomeController extends BaseController
         ]);
     }
 
+public function courseDetail($id)
+{
+    $categories = DB::table('kategori')->get();
+    $course = DB::table('course')->where('id', $id)->first();
+
+    if (!$course) {
+        return $this->renderLegacyView('dashboard/course-detail', [
+            'title' => 'Detail Material - ' . config('app.name'),
+            'page' => 'course-detail',
+            'notFound' => true,
+            'categories' => $categories,
+        ]);
+    }
+
+    $materials = DB::table('materi')->where('course_id', $id)->get();
+
+    return $this->renderLegacyView('dashboard/course-detail', [
+        'title' => 'Detail Material - ' . config('app.name'),
+        'page' => 'course-detail',
+        'course' => $course,
+        'categories' => $categories,
+        'materials' => $materials,
+    ]);
+}
+
     public function createCategory(Request $request)
     {
         if (!$request->session()->has('user_email')) {
@@ -150,24 +175,6 @@ class HomeController extends BaseController
         }
     }
 
-    public function previewMaterial($id)
-    {
-        $material = DB::table('materi')->where('id', $id)->first();
-        if (!$material || empty($material->file_materi)) {
-            return redirect('/home/courses');
-        }
-
-        $path = Storage::disk('public')->path($material->file_materi);
-        if (!file_exists($path)) {
-            return redirect('/home/courses');
-        }
-
-        return response()->file($path, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
-        ]);
-    }
-
     public function profile()
     {
         return $this->renderLegacyView('dashboard/profile', [
@@ -233,5 +240,189 @@ class HomeController extends BaseController
         DB::table('users')->where('id', $user['id'])->update(['foto_profil' => null]);
 
         return redirect('/profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        if (!$request->session()->has('user_email') || !$request->isMethod('post')) {
+            return redirect('/profile');
+        }
+
+        $user = $this->getAuthenticatedUser();
+        if (!$user) {
+            return redirect('/login');
+        }
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telephone' => 'nullable|string|max:20',
+        ]);
+
+        // Check if email already exists for another user
+        $emailExists = DB::table('users')
+            ->where('email', $data['email'])
+            ->where('id', '!=', $user['id'])
+            ->exists();
+
+        if ($emailExists) {
+            return redirect('/profile')->with('error', 'Email sudah terdaftar oleh pengguna lain.');
+        }
+
+        try {
+            DB::table('users')
+                ->where('id', $user['id'])
+                ->update([
+                    'nama' => $data['name'],
+                    'email' => $data['email'],
+                    'no_telp' => $data['telephone'],
+                ]);
+
+            session(['user_email' => $data['email']]);
+
+            return redirect('/profile')->with('success', 'Profil berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect('/profile')->with('error', 'Gagal memperbarui profil: ' . $e->getMessage());
+        }
+    }
+
+    public function showUploadForm()
+    {
+        if (!session()->has('user_email')) {
+            return redirect('/login');
+        }
+
+        $categories = DB::table('kategori')->get();
+        $courses = DB::table('course')->get();
+
+        return $this->renderLegacyView('dashboard/upload', [
+            'title' => 'Upload Materi - ' . config('app.name'),
+            'page' => 'upload-material',
+            'message' => 'Upload materi pembelajaran baru.',
+            'categories' => $categories,
+            'courses' => $courses,
+        ]);
+    }
+
+    public function editCourseForm($id)
+    {
+        if (!session()->has('user_email')) {
+            return redirect('/login');
+        }
+
+        $course = DB::table('course')->where('id', $id)->first();
+        if (!$course) {
+            return redirect('/home/courses')->with('error', 'Course tidak ditemukan.');
+        }
+
+        $categories = DB::table('kategori')->get();
+
+        return $this->renderLegacyView('dashboard/course-edit', [
+            'title' => 'Edit Course - ' . config('app.name'),
+            'page' => 'edit-course',
+            'course' => $course,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function updateCourse(Request $request, $id)
+    {
+        if (!session()->has('user_email')) {
+            return redirect('/login');
+        }
+
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'nullable',
+        ]);
+
+        try {
+            $update = [
+                'nama_course' => $data['title'],
+                'deskripsi' => $data['description'] ?? null,
+            ];
+
+            if (!empty($data['category']) && Schema::hasColumn('course', 'kategori_id')) {
+                $update['kategori_id'] = $data['category'];
+            }
+
+            DB::table('course')->where('id', $id)->update($update);
+
+            return redirect('/home/courses')->with('success', 'Course berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect("/course/$id/edit")->with('error', 'Gagal memperbarui course: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteCourse(Request $request, $id)
+    {
+        if (!session()->has('user_email') || !$request->isMethod('post')) {
+            return redirect('/home/courses');
+        }
+
+        try {
+            DB::table('course')->where('id', $id)->delete();
+            return redirect('/home/courses')->with('success', 'Course berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect('/home/courses')->with('error', 'Gagal menghapus course: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteMaterial(Request $request)
+    {
+        if (!session()->has('user_email') || !$request->isMethod('post')) {
+            return redirect('/home/courses');
+        }
+
+        $materialId = $request->input('id');
+
+        try {
+            $material = DB::table('materi')->where('id', $materialId)->first();
+            if ($material && Storage::disk('public')->exists($material->file_materi)) {
+                Storage::disk('public')->delete($material->file_materi);
+            }
+
+            DB::table('materi')->where('id', $materialId)->delete();
+            return redirect()->back()->with('success', 'Materi berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus materi: ' . $e->getMessage());
+        }
+    }
+
+    public function previewMaterial($id)
+    {
+        $material = DB::table('materi')->where('id', $id)->first();
+
+        if (!$material) {
+            return redirect('/home/courses')->with('error', 'Materi tidak ditemukan.');
+        }
+
+        $filepath = storage_path('app/public/' . $material->file_materi);
+
+        if (!file_exists($filepath)) {
+            return redirect('/home/courses')->with('error', 'File tidak ditemukan.');
+        }
+
+        return response()->file($filepath);
+    }
+
+    public function download($id = null)
+    {
+        if ($id) {
+            return $this->previewMaterial($id);
+        }
+
+        $categories = DB::table('kategori')->get();
+        $courses = DB::table('course')->get();
+        $materials = DB::table('materi')->get();
+
+        return $this->renderLegacyView('dashboard/download', [
+            'title' => 'Download Materi - ' . config('app.name'),
+            'page' => 'download',
+            'categories' => $categories,
+            'courses' => $courses,
+            'materials' => $materials,
+        ]);
     }
 }
