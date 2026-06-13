@@ -69,12 +69,7 @@ function escape($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 
                     <div class="md:col-span-1">
                         <label class="block mb-2 small-muted">Course (optional)</label>
-                        <select name="course" class="input-rounded">
-                            <option value="">Select course...</option>
-                            <?php if (isset($courses) && $courses): foreach ($courses as $c): ?>
-                                <option value="<?= escape($c->id ?? '') ?>"><?= escape($c->nama_course ?? $c->title ?? 'Course') ?></option>
-                            <?php endforeach; endif; ?>
-                        </select>
+                        <input name="course" type="text" class="input-rounded" placeholder="Enter course name..." />
                     </div>
 
                     <div class="md:col-span-2">

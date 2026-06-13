@@ -144,7 +144,7 @@ public function courseDetail($id)
         if (!$request->session()->has('user_email')) {
             return redirect('/login');
         }
-
+ 
         $data = $request->validate([
             'category' => 'nullable',
             'course' => 'nullable',
@@ -152,15 +152,33 @@ public function courseDetail($id)
             'description' => 'nullable|string',
             'material_file' => 'required|file|mimes:pdf|max:512000',
         ]);
-
+ 
         $file = $request->file('material_file');
         $path = $file->store('materials', 'public');
-
+ 
+        $courseId = null;
+        $courseName = trim($data['course'] ?? '');
+        if ($courseName !== '') {
+            $existingCourse = DB::table('course')->where('nama_course', $courseName)->first();
+            if ($existingCourse) {
+                $courseId = $existingCourse->id;
+            } else {
+                $courseId = Str::random(20);
+                DB::table('course')->insert([
+                    'id' => $courseId,
+                    'nama_course' => $courseName,
+                    'created_by' => $this->getAuthenticatedUser()['id'] ?? null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+ 
         try {
             DB::table('materi')->insert([
                 'id' => Str::random(20),
                 'user_id' => $this->getAuthenticatedUser()['id'] ?? null,
-                'course_id' => $data['course'] ?? null,
+                'course_id' => $courseId,
                 'kategori_id' => $data['category'] ?? null,
                 'judul' => $data['title'],
                 'deskripsi' => $data['description'] ?? null,
@@ -168,7 +186,7 @@ public function courseDetail($id)
                 'tanggal_upload' => now(),
                 'updated_at' => now(),
             ]);
-
+ 
             return redirect('/home/courses')->with('success', 'Materi berhasil diupload.');
         } catch (\Exception $e) {
             return redirect('/home/courses')->with('error', 'Gagal upload materi: ' . $e->getMessage());

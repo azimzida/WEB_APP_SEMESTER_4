@@ -166,6 +166,47 @@ function escape($value) {
     .btn-card-download:hover {
         background-color: #4A5568;
     }
+
+    /* Alert box styling */
+    .alert-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+        animation: fadeIn 0.3s ease;
+    }
+    .alert-success {
+        background: #E6FDF4;
+        color: #047857;
+        border: 1px solid #A7F3D0;
+    }
+    .alert-error {
+        background: #FEE2E2;
+        color: #B91C1C;
+        border: 1px solid #FCA5A5;
+    }
+    .alert-close {
+        background: none;
+        border: none;
+        color: inherit;
+        font-size: 1.2rem;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+        padding: 0 8px;
+    }
+    .alert-close:hover {
+        opacity: 1;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
 <div class="min-h-screen edu-bg flex flex-col">
@@ -225,14 +266,36 @@ function escape($value) {
         </aside>
 
         <main class="p-8 space-y-8">
-            
+            <?php if (session()->has('success')): ?>
+                <div id="success-alert" class="alert-box alert-success">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.25rem;">✨</span>
+                        <span><?= escape(session('success')) ?></span>
+                    </div>
+                    <button onclick="document.getElementById('success-alert').remove()" class="alert-close">✕</button>
+                </div>
+            <?php endif; ?>
+
+            <?php if (session()->has('error')): ?>
+                <div id="error-alert" class="alert-box alert-error">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.25rem;">⚠️</span>
+                        <span><?= escape(session('error')) ?></span>
+                    </div>
+                    <button onclick="document.getElementById('error-alert').remove()" class="alert-close">✕</button>
+                </div>
+            <?php endif; ?>
+
             <div class="hero-banner p-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-center min-h-[180px]">
                 <div class="space-y-3 z-10 text-center md:text-left">
                     <h2 class="text-3xl font-extrabold text-slate-800" style="color: #3B324E;">Share Learning Materials More Easily</h2>
                     <p class="text-sm font-medium text-slate-500">The best place to share and find college study materials.</p>
-                    <div class="pt-2">
-                        <button id="uploadMaterialButtonTop" type="button" class="bg-[#FFC436] text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition hover:opacity-90">
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <a href="/materials/upload" class="bg-[#FFC436] text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition hover:opacity-90 inline-block">
                             + Upload Materi
+                        </a>
+                        <button onclick="toggleCategoryModal(true)" type="button" class="bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition hover:bg-indigo-700">
+                            + Kategori
                         </button>
                     </div>
                 </div>
@@ -242,7 +305,7 @@ function escape($value) {
             </div>
 
             <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 items-center">
                     <button class="btn-filter active">All</button>
                     <button class="btn-filter" data-category="database">Data Base</button>
                     <button class="btn-filter" data-category="programming">Programming</button>
@@ -253,6 +316,10 @@ function escape($value) {
                             <?= escape($cat->nama_kategori ?? $cat->name ?? $cat->nama ?? 'Category') ?>
                         </button>
                     <?php endforeach; endif; ?>
+
+                    <button onclick="toggleCategoryModal(true)" type="button" class="bg-purple-100 text-purple-700 font-bold px-4 py-2 rounded-lg transition hover:bg-purple-200 text-sm">
+                        + Kategori
+                    </button>
                 </div>
 
                 <div class="search-wrapper flex items-center gap-3 px-4 py-2 w-full max-w-xs">
@@ -333,6 +400,61 @@ function escape($value) {
         </main>
     </div>
 </div>
+
+<!-- Modal Tambah Kategori -->
+<div id="categoryModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-300">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-300" id="categoryModalCard">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-slate-800">Tambah Kategori Baru</h3>
+            <button onclick="toggleCategoryModal(false)" class="text-slate-400 hover:text-slate-600 text-xl font-semibold">✕</button>
+        </div>
+
+        <form action="/kategori/create" method="post" class="space-y-4">
+            <?= csrf_field() ?>
+            <div>
+                <label class="block text-sm font-semibold text-slate-600 mb-2">Nama Kategori</label>
+                <input name="name" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-purple-500 focus:bg-white transition" placeholder="Masukkan nama kategori baru..." required />
+            </div>
+
+            <div class="flex gap-3 justify-end pt-2">
+                <button type="button" onclick="toggleCategoryModal(false)" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition">
+                    Batal
+                </button>
+                <button type="submit" class="bg-purple-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-md transition hover:bg-purple-700">
+                    Simpan Kategori
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleCategoryModal(show) {
+    const modal = document.getElementById('categoryModal');
+    const card = document.getElementById('categoryModalCard');
+    if (show) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+        }, 10);
+    } else {
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 150);
+    }
+}
+
+// Close modal when clicking outside of the modal card
+window.addEventListener('click', function (e) {
+    const modal = document.getElementById('categoryModal');
+    if (e.target === modal) {
+        toggleCategoryModal(false);
+    }
+});
+</script>
 
 <script>
 // Filter interaktif frontend untuk fungsionalitas kotak pencarian & tombol kategori
