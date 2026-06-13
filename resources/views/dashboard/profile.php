@@ -6,184 +6,460 @@
 $dbStatus = $dbStatus ?? false;
 $dbStatusMessage = $dbStatusMessage ?? 'Database status unavailable.';
 $user = $user ?? null;
-$userName = $user['nama'] ?? null;
-$userEmail = $user['email'] ?? null;
-$userPhone = $user['no_telp'] ?? 'Belum diisi';
-$userRole = $user['role'] ?? 'Pengguna';
-$userJoined = $user['created_at'] ?? 'Tidak tersedia';
+$userName = $user['nama'] ?? '';
+$userEmail = $user['email'] ?? '';
+$userPhone = $user['no_telp'] ?? '';
 $userPhoto = $user['foto_profil'] ?? null;
+
+function escape($value) {
+    return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+$userPhotoSrc = '';
+if (!empty($userPhoto)) {
+    $imageInfo = @getimagesizefromstring($userPhoto);
+    $mime = $imageInfo['mime'] ?? 'image/jpeg';
+    $userPhotoSrc = 'data:' . $mime . ';base64,' . base64_encode($userPhoto);
+}
 ?>
 
-<div class="min-h-screen bg-slate-100">
-    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header class="flex flex-col gap-6 rounded-[2rem] bg-white px-6 py-6 shadow-2xl shadow-slate-200/20 lg:flex-row lg:items-center lg:justify-between lg:px-10 lg:py-8">
-            <div class="flex items-center gap-3">
-                <div class="flex h-12 w-12 items-center justify-center rounded-3xl bg-violet-500 text-xl font-bold text-white">E</div>
-                <div>
-                    <div class="mb-2 flex items-center">
-                        <span class="h-3 w-3 rounded-full <?= $dbStatus ? 'bg-emerald-500' : 'bg-rose-500' ?>" title="<?= htmlspecialchars($dbStatusMessage, ENT_QUOTES, 'UTF-8') ?>"></span>
-                    </div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.3em] text-violet-600">Edu Share</p>
-                    <p class="text-xs text-slate-500">Learn easier and more structured</p>
-                </div>
-            </div>
+<style>
+    body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: #F8F5FF;
+    }
+    .page-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 36px;
+        background: #FFFFFF;
+        border-bottom: 1px solid #E6E8F0;
+        box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
+    }
+    .brand-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .brand-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #7C3AED 0%, #C084FC 100%);
+        color: #FFFFFF;
+        font-size: 1.5rem;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+    }
+    .brand-name {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #2D3748;
+    }
+    .topnav {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+    }
+    .topnav a {
+        color: #9096A3;
+        text-decoration: none;
+        font-weight: 700;
+        transition: color .2s ease;
+    }
+    .topnav a:hover,
+    .topnav a.active {
+        color: #2D3748;
+    }
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+    .topbar-right button {
+        background: #F8F5FF;
+        border: none;
+        border-radius: 999px;
+        width: 42px;
+        height: 42px;
+        font-size: 1.15rem;
+        cursor: pointer;
+    }
+    .topbar-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #2D3748;
+        font-weight: 700;
+    }
+    .topbar-user img {
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        object-fit: cover;
+    }
+    .layout-body {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 24px;
+        width: calc(100% - 72px);
+        max-width: 1420px;
+        margin: 32px auto 64px;
+        padding: 0 24px;
+    }
+    .sidebar {
+        background: #FFFFFF;
+        border-radius: 32px;
+        border: 1px solid #E9E8F8;
+        padding: 28px 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .sidebar nav {
+        display: grid;
+        gap: 10px;
+    }
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        border-radius: 18px;
+        text-decoration: none;
+        color: #718096;
+        font-weight: 700;
+        transition: background .2s ease, color .2s ease;
+    }
+    .sidebar a:hover,
+    .sidebar a.active {
+        background: #F5F3FF;
+        color: #4C51BF;
+    }
+    .sidebar-footer a {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: #5B21B6;
+        color: #FFFFFF;
+        padding: 14px 0;
+        border-radius: 18px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+    .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    .hero-card {
+        background: linear-gradient(135deg, #EDE7FF 0%, #FFF3EC 100%);
+        border-radius: 30px;
+        padding: 36px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: center;
+    }
+    .hero-text h1 {
+        margin: 0;
+        font-size: 2.4rem;
+        color: #2D2A43;
+        letter-spacing: -0.03em;
+    }
+    .hero-text p {
+        margin: 12px 0 0;
+        color: #5B6680;
+        font-size: 0.98rem;
+        max-width: 520px;
+    }
+    .hero-visual {
+        width: 100%;
+        max-width: 180px;
+        height: 180px;
+        background: #F8F2FF;
+        border-radius: 28px;
+        display: grid;
+        place-items: center;
+        font-size: 4rem;
+    }
+    .content-card {
+        background: #FFFFFF;
+        border-radius: 32px;
+        border: 1px solid #F0EEFA;
+        padding: 32px;
+        box-shadow: 0 28px 60px rgba(33, 20, 120, 0.06);
+    }
+    .profile-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .avatar-block {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+    .avatar-view-container {
+        position: relative;
+        width: 140px;
+        height: 140px;
+    }
+    .avatar-main-image {
+        width: 140px;
+        height: 140px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 4px solid #5B21B6;
+    }
+    .avatar-icon-fallback {
+        width: 140px;
+        height: 140px;
+        border-radius: 999px;
+        background: #EEEAFD;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid #5B21B6;
+        font-size: 3rem;
+    }
+    .camera-badge-icon {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+    .profile-form {
+        display: grid;
+        gap: 20px;
+    }
+    .profile-field {
+        display: grid;
+        gap: 10px;
+    }
+    .profile-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #4A5568;
+    }
+    .profile-input {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid #E2E8F0;
+        background: #F3F4F6;
+        padding: 16px 18px;
+        color: #2D3748;
+        font-size: 0.98rem;
+    }
+    .profile-input:focus {
+        outline: none;
+        border-color: #A78BFA;
+        background: #F8F5FF;
+    }
+    .profile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 12px;
+    }
+    .btn-upload-photo,
+    .btn-delete-photo,
+    .btn-save-changes,
+    .btn-back-home {
+        border: none;
+        border-radius: 16px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .btn-upload-photo {
+        background: #7C3AED;
+        color: #FFFFFF;
+        padding: 16px 28px;
+    }
+    .btn-delete-photo {
+        background: #EF4444;
+        color: #FFFFFF;
+        padding: 16px 28px;
+    }
+    .btn-save-changes {
+        background: #FBBF24;
+        color: #1F2937;
+        padding: 16px 30px;
+    }
+    .btn-back-home {
+        background: #F97316;
+        color: #FFFFFF;
+        padding: 16px 28px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .file-preview-text {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #718096;
+        max-width: 150px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .photo-input {
+        display: none;
+    }
+    @media (max-width: 1024px) {
+        .layout-body { grid-template-columns: 1fr; }
+        .sidebar { min-height: auto; }
+        .topnav { display: none; }
+    }
+</style>
 
-            <div class="md:hidden">
-                <button id="hamburger" class="text-slate-600 text-2xl">☰</button>
-            </div>
+<div class="page-shell">
+    <header class="topbar">
+        <div class="brand-title">
+            <div class="brand-icon">E</div>
+            <div class="brand-name">Edu Share</div>
+        </div>
 
-            <nav id="nav" class="hidden md:flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
-                <a href="/dashboard" class="rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Home</a>
-                <a href="/about" class="rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
-                <?php if ($user): ?>
-                    <div class="ml-4 flex items-center gap-3">
-                        <a href="/profile" class="flex items-center gap-3 rounded-full bg-slate-100 text-slate-900 transition hover:bg-slate-200 px-3 py-2">
-                            <?php if (!empty($userPhoto)): ?>
-                                <img src="<?= htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($userName ?: 'Profile', ENT_QUOTES, 'UTF-8') ?>" class="h-10 w-10 rounded-full object-cover" />
-                            <?php else: ?>
-                                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-sm font-semibold text-white"><?= strtoupper(substr($userName ?? ($userEmail ?? 'U'), 0, 1)) ?></span>
-                            <?php endif; ?>
-                            <span class="text-sm font-semibold text-slate-900"><?= htmlspecialchars($userName ?? ($userEmail ?? 'User'), ENT_QUOTES, 'UTF-8') ?></span>
-                        </a>
-                        <a href="/logout" class="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700">Logout</a>
-                    </div>
-                <?php else: ?>
-                    <div class="ml-4 flex flex-wrap items-center gap-2">
-                        <a href="/login" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">Login</a>
-                        <a href="/register" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">Register</a>
-                    </div>
-                <?php endif; ?>
+        <nav class="topnav">
+            <a href="/dashboard">Home</a>
+            <a href="/home/courses">Course</a>
+            <a href="/materials/upload">Upload</a>
+            <a href="/download">Download</a>
+        </nav>
+
+        <div class="topbar-right">
+            <button type="button" aria-label="Notifications">🔔</button>
+            <div class="topbar-user">
+                <img src="<?= $userPhotoSrc ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' ?>" alt="Avatar">
+                <span><?= $userName ? escape($userName) : 'User' ?></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-body">
+        <aside class="sidebar">
+            <nav>
+                <a href="/dashboard">🏠 Home</a>
+                <a href="/home/courses">🗂️ Course</a>
+                <a href="/download">📥 Download</a>
+                <a href="/profile" class="active">👤 Profile</a>
             </nav>
-        </header>
 
-        <section class="mt-10 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-            <div class="space-y-6">
-                <span class="inline-flex rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700">Profil Saya</span>
-                <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">Halo, <?= htmlspecialchars($userName ?? 'Pengguna', ENT_QUOTES, 'UTF-8') ?></h1>
-                <p class="max-w-2xl text-lg leading-8 text-slate-600"><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
+            <div class="sidebar-footer">
+                <a href="/logout">Log Out</a>
+            </div>
+        </aside>
 
-                <?php if ($user): ?>
-                    <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg">
-                        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                            <div class="flex items-center gap-5">
-                                <?php if (!empty($userPhoto)): ?>
-                                    <img id="profile-photo-preview" src="<?= htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($userName, ENT_QUOTES, 'UTF-8') ?>" class="h-24 w-24 rounded-full object-cover" />
-                                <?php else: ?>
-                                    <span id="profile-photo-preview" class="flex h-24 w-24 items-center justify-center rounded-full bg-violet-600 text-4xl font-bold text-white"><?= strtoupper(substr($userName ?? 'U', 0, 1)) ?></span>
-                                <?php endif; ?>
-                                <div>
-                                    <h2 class="text-2xl font-semibold text-slate-900"><?= htmlspecialchars($userName, ENT_QUOTES, 'UTF-8') ?></h2>
-                                    <p class="text-sm text-slate-500"><?= htmlspecialchars($userRole, ENT_QUOTES, 'UTF-8') ?></p>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-3 sm:flex-row">
-                                <button id="open-photo-modal" type="button" class="inline-flex items-center justify-center rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700">Edit Photo</button>
-                                <?php if (!empty($userPhoto)): ?>
-                                    <form action="/profile/delete" method="post" class="inline">
-                                    <?= csrf_field() ?>
-                                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus foto profil?');" class="inline-flex items-center justify-center rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Delete Photo</button>
-                                </form>
-                                <?php endif; ?>
-                            </div>
-                        </div>
+        <section class="panel">
+            <div class="hero-card">
+                <div class="hero-text">
+                    <h1>Edit Profile</h1>
+                    <p>Update your account information and change your profile photo.</p>
+                </div>
+                <div class="hero-visual">👩‍💻</div>
+            </div>
 
-                        <div class="mt-8 grid gap-4 sm:grid-cols-2">
-                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                                <p class="text-sm text-slate-500">Email</p>
-                                <p class="mt-2 text-lg font-semibold text-slate-900"><?= htmlspecialchars($userEmail, ENT_QUOTES, 'UTF-8') ?></p>
-                            </div>
-                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                                <p class="text-sm text-slate-500">Nomor Telepon</p>
-                                <p class="mt-2 text-lg font-semibold text-slate-900"><?= htmlspecialchars($userPhone, ENT_QUOTES, 'UTF-8') ?></p>
-                            </div>
-                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                                <p class="text-sm text-slate-500">Role</p>
-                                <p class="mt-2 text-lg font-semibold text-slate-900"><?= htmlspecialchars($userRole, ENT_QUOTES, 'UTF-8') ?></p>
-                            </div>
-                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                                <p class="text-sm text-slate-500">Bergabung sejak</p>
-                                <p class="mt-2 text-lg font-semibold text-slate-900"><?= htmlspecialchars($userJoined, ENT_QUOTES, 'UTF-8') ?></p>
-                            </div>
+            <div class="content-card">
+                <div class="profile-header">
+                    <div class="avatar-block">
+                        <div class="avatar-view-container">
+                            <?php if ($userPhotoSrc): ?>
+                                <img id="avatar-preview" src="<?= escape($userPhotoSrc) ?>" alt="Avatar" class="avatar-main-image">
+                            <?php else: ?>
+                                <div id="avatar-fallback" class="avatar-icon-fallback">👤</div>
+                                <img id="avatar-preview" src="" alt="Avatar" class="avatar-main-image hidden">
+                            <?php endif; ?>
+
+                            <label for="foto_profil" class="camera-badge-icon" title="Ubah Foto Profil">📷</label>
+                            <input type="file" id="foto_profil" name="foto_profil" accept="image/*" class="photo-input" onchange="previewImage(event)">
                         </div>
                     </div>
-                <?php else: ?>
-                    <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-lg">
-                        <h2 class="text-2xl font-semibold text-slate-900">Kamu belum login</h2>
-                        <p class="mt-4 text-slate-600">Silakan masuk terlebih dahulu untuk melihat halaman profil.</p>
-                        <div class="mt-6 flex flex-wrap gap-3">
-                            <a href="/login" class="rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700">Login</a>
-                            <a href="/register" class="rounded-full bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-200">Register</a>
-                        </div>
+
+                    <div class="profile-actions">
+                        <form action="/profile/upload" method="post" enctype="multipart/form-data">
+                            <?php if (function_exists('csrf_field')) echo csrf_field(); ?>
+                            <input type="hidden" name="foto_profil" value="">
+                            <button type="submit" class="btn-upload-photo">Upload Photo</button>
+                        </form>
+
+                        <?php if ($userPhotoSrc): ?>
+                            <form action="/profile/delete" method="post">
+                                <?php if (function_exists('csrf_field')) echo csrf_field(); ?>
+                                <button type="submit" class="btn-delete-photo" onclick="return confirm('Hapus foto profil?');">Delete Photo</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
-                <?php endif; ?>
+                </div>
+
+                <form action="/profile/update" method="post" class="profile-form">
+                    <?php if (function_exists('csrf_field')) echo csrf_field(); ?>
+
+                    <div class="profile-field">
+                        <label class="profile-label">Name</label>
+                        <input type="text" name="name" class="profile-input" value="<?= escape($userName) ?>" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-label">Email</label>
+                        <input type="email" name="email" class="profile-input" value="<?= escape($userEmail) ?>" placeholder="name@example.com">
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-label">Telephone</label>
+                        <input type="text" name="telephone" class="profile-input" value="<?= escape($userPhone) ?>" placeholder="e.g. 08123456789">
+                    </div>
+
+                    <div class="profile-actions">
+                        <button type="submit" class="btn-save-changes">Save Changes</button>
+                        <a href="/dashboard" class="btn-back-home">Back to Home</a>
+                    </div>
+                </form>
             </div>
         </section>
     </div>
 </div>
 
-<div id="photo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 p-4">
-    <div class="w-full max-w-xl rounded-[2rem] bg-white p-6 shadow-2xl">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <h2 class="text-2xl font-semibold text-slate-900">Edit Foto Profil</h2>
-                <p class="mt-1 text-sm text-slate-500">Pilih file foto untuk memperbarui avatar profil Anda.</p>
-            </div>
-            <button id="close-photo-modal" type="button" class="rounded-full bg-slate-100 px-3 py-2 text-slate-700 transition hover:bg-slate-200">×</button>
-        </div>
-
-        <form id="photo-upload-form" action="/profile/upload" method="post" enctype="multipart/form-data" class="mt-6">
-            <?= csrf_field() ?>
-            <label class="block text-sm font-medium text-slate-700">Foto baru</label>
-            <input id="photo-input" name="photo" type="file" accept="image/*" required class="mt-2 block w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700" />
-
-            <div id="upload-preview" class="mt-4 hidden rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p class="text-sm text-slate-500">Pratinjau</p>
-                <img id="upload-preview-image" src="#" alt="Preview Foto" class="mt-3 h-32 w-32 rounded-full object-cover" />
-            </div>
-
-            <div class="mt-6 flex flex-wrap gap-3 justify-end">
-                <button id="cancel-photo-modal" type="button" class="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Batal</button>
-                <button type="submit" class="rounded-full bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-700">Simpan Foto</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script>
-    const openPhotoModal = document.getElementById('open-photo-modal');
-    const closePhotoModal = document.getElementById('close-photo-modal');
-    const cancelPhotoModal = document.getElementById('cancel-photo-modal');
-    const photoModal = document.getElementById('photo-modal');
-    const photoInput = document.getElementById('photo-input');
-    const uploadPreview = document.getElementById('upload-preview');
-    const uploadPreviewImage = document.getElementById('upload-preview-image');
+function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById('avatar-preview');
+    const fallback = document.getElementById('avatar-fallback');
+    const file = input.files && input.files[0];
 
-    if (openPhotoModal && photoModal) {
-        const showModal = () => photoModal.classList.remove('hidden');
-        const hideModal = () => {
-            photoModal.classList.add('hidden');
-            photoInput.value = '';
-            uploadPreview.classList.add('hidden');
-            uploadPreviewImage.src = '#';
-        };
+    if (!file) return;
 
-        openPhotoModal.addEventListener('click', showModal);
-        closePhotoModal.addEventListener('click', hideModal);
-        cancelPhotoModal.addEventListener('click', hideModal);
-
-        photoInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) {
-                uploadPreview.classList.add('hidden');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                uploadPreviewImage.src = e.target.result;
-                uploadPreview.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        });
-    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        if (preview) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+        }
+        if (fallback) {
+            fallback.classList.add('hidden');
+        }
+    };
+    reader.readAsDataURL(file);
+}
 </script>
