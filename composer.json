@@ -13,5 +13,9 @@
             "App\\Models\\": "app/Models/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require-dev": {
+        "laravel/telescope": "^5.20",
+        "laravel/pail": "^1.2"
+    }
 }

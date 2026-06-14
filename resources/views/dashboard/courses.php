@@ -114,14 +114,6 @@ function escape($value) {
         background: #FFFFFF;
     }
 
-    /* Manajemen Warna Gradasi Presisi Untuk Setiap Jenis Card */
-    .card-gradient-database { background: linear-gradient(135deg, #4FA8B7 0%, #76C1CE 100%); }
-    .card-gradient-design { background: linear-gradient(135deg, #7A69CD 0%, #A396EB 100%); }
-    .card-gradient-programming { background: linear-gradient(135deg, #4274CD 0%, #6E97E2 100%); }
-    .card-gradient-php { background: linear-gradient(135deg, #C25D6B 0%, #E08593 100%); }
-    .card-gradient-relational { background: linear-gradient(135deg, #D49C43 0%, #ECC078 100%); }
-    .card-gradient-prototyping { background: linear-gradient(135deg, #3BB092 0%, #63CEB3 100%); }
-
     /* Default fallback card style */
     .course-item-card {
         background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
@@ -129,6 +121,16 @@ function escape($value) {
         overflow: hidden;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
     }
+
+    /* Manajemen Warna Gradasi Presisi Untuk Setiap Jenis Card */
+    .card-gradient-database { background: linear-gradient(135deg, #4FA8B7 0%, #76C1CE 100%); }
+    .card-gradient-design { background: linear-gradient(135deg, #7A69CD 0%, #A396EB 100%); }
+    .card-gradient-programming { background: linear-gradient(135deg, #4274CD 0%, #6E97E2 100%); }
+    .card-gradient-php { background: linear-gradient(135deg, #C25D6B 0%, #E08593 100%); }
+    .card-gradient-relational { background: linear-gradient(135deg, #D49C43 0%, #ECC078 100%); }
+    .card-gradient-prototyping { background: linear-gradient(135deg, #3BB092 0%, #63CEB3 100%); }
+    .card-gradient-orange { background: linear-gradient(135deg, #F97316 0%, #FB923C 100%); }
+    .card-gradient-purple { background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%); }
 
     .badge-category {
         background: rgba(255, 255, 255, 0.25);
@@ -331,24 +333,19 @@ function escape($value) {
             <section class="space-y-6">
                 <?php if (isset($courses) && $courses && count($courses) > 0): ?>
                     <div id="courseGrid" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        <?php foreach ($courses as $index => $course): 
-                            // Penentuan otomatis class gradasi warna agar dinamis menyerupai variasi gambar
-                            $cleanTitle = strtolower($course->nama_course ?? $course->title ?? '');
-                            $gradientClass = 'card-gradient-programming'; // Default fallback
-
-                            if (strpos($cleanTitle, 'sql') !== false || strpos($cleanTitle, 'base') !== false) {
-                                $gradientClass = 'card-gradient-database';
-                            } elseif (strpos($cleanTitle, 'ui') !== false || strpos($cleanTitle, 'ux') !== false) {
-                                $gradientClass = 'card-gradient-design';
-                            } elseif (strpos($cleanTitle, 'html') !== false || strpos($cleanTitle, 'css') !== false) {
-                                $gradientClass = 'card-gradient-programming';
-                            } elseif (strpos($cleanTitle, 'crud') !== false || strpos($cleanTitle, 'php') !== false) {
-                                $gradientClass = 'card-gradient-php';
-                            } elseif (strpos($cleanTitle, 'relational') !== false) {
-                                $gradientClass = 'card-gradient-relational';
-                            } elseif (strpos($cleanTitle, 'prototype') !== false || strpos($cleanTitle, 'step') !== false) {
-                                $gradientClass = 'card-gradient-prototyping';
-                            }
+                        <?php 
+                        $gradients = [
+                            'card-gradient-programming',
+                            'card-gradient-design',
+                            'card-gradient-php',
+                            'card-gradient-database',
+                            'card-gradient-orange',
+                            'card-gradient-purple',
+                            'card-gradient-prototyping',
+                            'card-gradient-relational'
+                        ];
+                        foreach ($courses as $index => $course): 
+                            $gradientClass = $gradients[$index % count($gradients)];
                         ?>
                             <article class="course-item-card <?= $gradientClass ?> flex flex-col justify-between min-h-[190px]">
                                 <div class="p-5 flex justify-between items-start">
@@ -371,8 +368,20 @@ function escape($value) {
                                     </div>
                                 </div>
 
+                                <?php 
+                                $materiId = '';
+                                if (isset($materials)) {
+                                    foreach ($materials as $m) {
+                                        if ($m->course_id == ($course->id ?? '')) {
+                                            $materiId = $m->id;
+                                            break;
+                                        }
+                                    }
+                                }
+                                $detailLink = $materiId ? "/home/previewMaterial/" . escape($materiId) : "/course/" . escape($course->id ?? '');
+                                ?>
                                 <div class="bg-white px-5 py-4 flex items-center justify-between border-t border-slate-50">
-                                    <a href="/course/<?= escape($course->id ?? '') ?>" class="btn-card-detail">
+                                    <a href="<?= $detailLink ?>" <?= $materiId ? 'target="_blank"' : '' ?> class="btn-card-detail">
                                         Detail
                                     </a>
                                     <button type="button" class="btn-card-download">

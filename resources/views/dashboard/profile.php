@@ -19,6 +19,13 @@ $userPhotoSrc = '';
 if (!empty($userPhoto)) {
     $userPhotoSrc = $userPhoto;
 }
+
+$courseMap = [];
+if (isset($courses) && is_iterable($courses)) {
+    foreach ($courses as $c) {
+        $courseMap[$c->id] = $c->nama_course ?? $c->title ?? 'Untitled Course';
+    }
+}
 ?>
 
 <style>
@@ -374,9 +381,9 @@ if (!empty($userPhoto)) {
 
 <div class="page-shell">
     <header class="topbar">
-        <div class="brand-title">
-            <div class="brand-icon">E</div>
-            <div class="brand-name">Edu Share</div>
+        <div class="brand-title" style="gap: 8px;">
+            <span style="font-size: 1.875rem;">🎓</span>
+            <span style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; color: #4E4260;">Edu Share</span>
         </div>
 
         <nav class="topnav">
@@ -492,6 +499,47 @@ if (!empty($userPhoto)) {
                         <a href="/dashboard" class="btn-back-home">Back to Home</a>
                     </div>
                 </form>
+            </div>
+
+            <div class="content-card" style="margin-top: 24px;">
+                <h3 style="color: #2D2A43; font-size: 1.5rem; font-weight: 800; margin: 0 0 16px 0;">Materi yang Diupload</h3>
+                <?php if (!empty($userMaterials) && count($userMaterials) > 0): ?>
+                    <div style="display: grid; gap: 16px;">
+                        <?php 
+                        $modulColors = [
+                            ['bg' => '#F8F5FF', 'border' => '#E9E2FF', 'text' => '#4E4260'], // Purple
+                            ['bg' => '#F0FDF4', 'border' => '#BBF7D0', 'text' => '#166534'], // Green
+                            ['bg' => '#FFFBEB', 'border' => '#FEF08A', 'text' => '#854D0E'], // Yellow
+                            ['bg' => '#EFF6FF', 'border' => '#BFDBFE', 'text' => '#1E40AF'], // Blue
+                            ['bg' => '#FEF2F2', 'border' => '#FECACA', 'text' => '#991B1B'], // Red
+                            ['bg' => '#FFF5F5', 'border' => '#FED7D7', 'text' => '#9B2C2C'], // Pink
+                            ['bg' => '#F0F9FF', 'border' => '#BAE6FD', 'text' => '#075985']  // Sky Blue
+                        ];
+                        $colorIndex = 0;
+                        ?>
+                        <?php foreach ($userMaterials as $material): 
+                            $colorTheme = $modulColors[$colorIndex % count($modulColors)];
+                            $colorIndex++;
+                        ?>
+                            <div style="border: 1px solid <?= $colorTheme['border'] ?>; border-radius: 16px; padding: 16px; background: <?= $colorTheme['bg'] ?>; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; transition: transform 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1.1rem; color: <?= $colorTheme['text'] ?>; font-weight: 800;"><?= escape($material->judul) ?></h4>
+                                    <p style="margin: 4px 0 0; font-size: 0.9rem; color: #718096; font-weight: 600;">
+                                        Course: <?= escape($courseMap[$material->course_id] ?? 'Unknown Course') ?>
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <a href="/home/previewMaterial/<?= escape($material->id) ?>" target="_blank" style="background: #10B981; color: white; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: opacity 0.2s ease;">Lihat PDF</a>
+                                    <a href="/materials/<?= escape($material->id) ?>/edit" style="background: #6366F1; color: white; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: opacity 0.2s ease;">Edit Material</a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div style="border: 2px dashed #E2E8F0; border-radius: 16px; padding: 32px; text-align: center; color: #A0AEC0; font-weight: 600;">
+                        Belum ada materi yang diupload.
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
     </div>

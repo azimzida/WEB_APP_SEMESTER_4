@@ -195,10 +195,24 @@ public function courseDetail($id)
 
     public function profile()
     {
+        $user = $this->getAuthenticatedUser();
+        $userMaterials = [];
+        $courses = [];
+        $categories = [];
+        
+        if ($user) {
+            $userMaterials = DB::table('materi')->where('user_id', $user['id'])->get();
+            $courses = DB::table('course')->get();
+            $categories = DB::table('kategori')->get();
+        }
+
         return $this->renderLegacyView('dashboard/profile', [
             'title' => 'Profil Saya - ' . config('app.name'),
             'page' => 'profil',
             'message' => 'Halaman profil sementara untuk melihat data akun dan status profil.',
+            'userMaterials' => $userMaterials,
+            'courses' => $courses,
+            'categories' => $categories,
         ]);
     }
 
@@ -384,6 +398,94 @@ public function courseDetail($id)
             return redirect('/home/courses')->with('success', 'Course berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect('/home/courses')->with('error', 'Gagal menghapus course: ' . $e->getMessage());
+        }
+    }
+
+    public function editMaterialForm($id)
+    {
+        if (!session()->has('user_email')) {
+            return redirect('/login');
+        }
+
+        $material = DB::table('materi')->where('id', $id)->first();
+        if (!$material) {
+            return redirect('/home/courses')->with('error', 'Materi tidak ditemukan.');
+        }
+
+        $user = $this->getAuthenticatedUser();
+        if ($material->user_id !== $user['id']) {
+            return redirect('/home/courses')->with('error', 'Anda tidak berhak mengedit materi ini.');
+        }
+
+        $categories = DB::table('kategori')->get();
+        $courses = DB::table('course')->get();
+        $course = $material->course_id ? DB::table('course')->where('id', $material->course_id)->first() : null;
+
+        return $this->renderLegacyView('dashboard/material-edit', [
+            'title' => 'Edit Materi - ' . config('app.name'),
+            'page' => 'edit-material',
+            'material' => $material,
+            'categories' => $categories,
+            'courses' => $courses,
+            'course' => $course,
+        ]);
+    }
+
+    public function updateMaterial(Request $request, $id)
+    {
+        if (!session()->has('user_email')) {
+            return redirect('/login');
+        }
+
+        $material = DB::table('materi')->where('id', $id)->first();
+        if (!$material) {
+            return redirect('/home/courses')->with('error', 'Materi tidak ditemukan.');
+        }
+
+        $user = $this->getAuthenticatedUser();
+        if ($material->user_id !== $user['id']) {
+            return redirect('/home/courses')->with('error', 'Anda tidak berhak mengedit materi ini.');
+        }
+
+        $data = $request->validate([
+            'category' => 'nullable',
+            'title' => 'required|string|max:255',
+            'course_name' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'material_file' => 'nullable|file|mimes:pdf|max:512000',
+        ]);
+
+        $update = [
+            'kategori_id' => $data['category'] ?? null,
+            'judul' => $data['title'],
+            'deskripsi' => $data['description'] ?? null,
+            'updated_at' => now(),
+        ];
+
+        if ($request->hasFile('material_file')) {
+            $file = $request->file('material_file');
+            $path = $file->store('materials', 'public');
+            $update['file_materi'] = $path;
+            
+            if (Storage::disk('public')->exists($material->file_materi)) {
+                Storage::disk('public')->delete($material->file_materi);
+            }
+        }
+
+        try {
+            DB::table('materi')->where('id', $id)->update($update);
+            
+            if ($material->course_id && !empty($data['course_name'])) {
+                $courseUpdate = ['nama_course' => $data['course_name']];
+                if (!empty($data['category']) && Schema::hasColumn('course', 'kategori_id')) {
+                    $courseUpdate['kategori_id'] = $data['category'];
+                }
+                DB::table('course')->where('id', $material->course_id)->update($courseUpdate);
+            }
+            
+            return redirect('/profile')->with('success', 'Materi berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect("/materials/$id/edit")->with('error', 'Gagal memperbarui materi: ' . $e->getMessage());
         }
     }
 

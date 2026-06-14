@@ -33,6 +33,8 @@ Route::post('/course/create', [App\Http\Controllers\HomeController::class, 'crea
 Route::post('/materials/upload', [App\Http\Controllers\HomeController::class, 'uploadMaterial']);
 Route::get('/home/previewMaterial/{id}', [App\Http\Controllers\HomeController::class, 'previewMaterial']);
 Route::get('/home/view_pdf/{id}', [App\Http\Controllers\HomeController::class, 'previewMaterial']);
+Route::get('/materials/{id}/edit', [App\Http\Controllers\HomeController::class, 'editMaterialForm']);
+Route::post('/materials/{id}/update', [App\Http\Controllers\HomeController::class, 'updateMaterial']);
 
 Route::fallback(function () {
     $dbStatus = true;
