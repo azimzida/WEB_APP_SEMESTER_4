@@ -1,4 +1,6 @@
-<?php
+@extends('layouts.main')
+@section('content')
+@php
 /* @var string $title */
 /* @var string $name */
 /* @var string $page */
@@ -15,10 +17,19 @@ function escape($value) {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
 
-$userPhotoSrc = '';
-if (!empty($userPhoto)) {
-    $userPhotoSrc = $userPhoto;
+function getPhotoSrc($photoData) {
+    if (empty($photoData)) return '';
+    if (strpos($photoData, 'http') === 0 || strpos($photoData, 'data:image') === 0) {
+        return $photoData;
+    }
+    $mime = 'image/jpeg';
+    if (strpos($photoData, "\x89PNG") === 0) $mime = 'image/png';
+    elseif (strpos($photoData, "GIF8") === 0) $mime = 'image/gif';
+    elseif (strpos($photoData, "RIFF") === 0 && strpos(substr($photoData, 8, 4), "WEBP") === 0) $mime = 'image/webp';
+    return 'data:' . $mime . ';base64,' . base64_encode($photoData);
 }
+
+$userPhotoSrc = getPhotoSrc($userPhoto);
 
 $courseMap = [];
 if (isset($courses) && is_iterable($courses)) {
@@ -26,7 +37,7 @@ if (isset($courses) && is_iterable($courses)) {
         $courseMap[$c->id] = $c->nama_course ?? $c->title ?? 'Untitled Course';
     }
 }
-?>
+@endphp
 
 <style>
     body {
@@ -396,8 +407,8 @@ if (isset($courses) && is_iterable($courses)) {
         <div class="topbar-right">
             <button type="button" aria-label="Notifications">🔔</button>
             <div class="topbar-user">
-                <img src="<?= $userPhotoSrc ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' ?>" alt="Avatar">
-                <span><?= $userName ? escape($userName) : 'User' ?></span>
+                <img src="{{ $userPhotoSrc ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' }}" alt="Avatar">
+                <span>{{ $userName ? escape($userName) : 'User' }}</span>
             </div>
         </div>
     </header>
@@ -425,36 +436,36 @@ if (isset($courses) && is_iterable($courses)) {
                 <div class="hero-visual">👩‍💻</div>
             </div>
 
-            <?php if (session()->has('success')): ?>
+            @if(session()->has('success'))
                 <div id="success-alert" class="alert-box alert-success">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.25rem;">✨</span>
-                        <span><?= escape(session('success')) ?></span>
+                        <span>{{ session('success') }}</span>
                     </div>
                     <button onclick="document.getElementById('success-alert').remove()" class="alert-close">✕</button>
                 </div>
-            <?php endif; ?>
+            @endif
 
-            <?php if (session()->has('error')): ?>
+            @if(session()->has('error'))
                 <div id="error-alert" class="alert-box alert-error">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.25rem;">⚠️</span>
-                        <span><?= escape(session('error')) ?></span>
+                        <span>{{ session('error') }}</span>
                     </div>
                     <button onclick="document.getElementById('error-alert').remove()" class="alert-close">✕</button>
                 </div>
-            <?php endif; ?>
+            @endif
 
             <div class="content-card">
                 <div class="profile-header">
                     <div class="avatar-block">
                         <div class="avatar-view-container">
-                            <?php if ($userPhotoSrc): ?>
-                                <img id="avatar-preview" src="<?= escape($userPhotoSrc) ?>" alt="Avatar" class="avatar-main-image">
-                            <?php else: ?>
+                            @if($userPhotoSrc)
+                                <img id="avatar-preview" src="{{ $userPhotoSrc }}" alt="Avatar" class="avatar-main-image">
+                            @else
                                 <div id="avatar-fallback" class="avatar-icon-fallback">👤</div>
                                 <img id="avatar-preview" src="" alt="Avatar" class="avatar-main-image hidden">
-                            <?php endif; ?>
+                            @endif
 
                             <label for="foto_profil" class="camera-badge-icon" title="Ubah Foto Profil">📷</label>
                         </div>
@@ -462,36 +473,36 @@ if (isset($courses) && is_iterable($courses)) {
 
                     <div class="profile-actions">
                         <form action="/profile/upload" method="post" enctype="multipart/form-data">
-                            <?php if (function_exists('csrf_field')) echo csrf_field(); ?>
+                            @php if (function_exists('csrf_field')) echo csrf_field(); @endphp
                             <input type="file" id="foto_profil" name="photo" accept="image/*" class="photo-input" onchange="previewImage(event)">
                             <button type="submit" class="btn-upload-photo">Upload Photo</button>
                         </form>
 
-                        <?php if ($userPhotoSrc): ?>
+                        @if($userPhotoSrc)
                             <form action="/profile/delete" method="post">
-                                <?php if (function_exists('csrf_field')) echo csrf_field(); ?>
+                                @php if (function_exists('csrf_field')) echo csrf_field(); @endphp
                                 <button type="submit" class="btn-delete-photo" onclick="return confirm('Hapus foto profil?');">Delete Photo</button>
                             </form>
-                        <?php endif; ?>
+                        @endif
                     </div>
                 </div>
 
                 <form action="/profile/update" method="post" class="profile-form">
-                    <?php if (function_exists('csrf_field')) echo csrf_field(); ?>
+                    @php if (function_exists('csrf_field')) echo csrf_field(); @endphp
 
                     <div class="profile-field">
                         <label class="profile-label">Name</label>
-                        <input type="text" name="name" class="profile-input" value="<?= escape($userName) ?>" placeholder="Enter your full name">
+                        <input type="text" name="name" class="profile-input" value="{{ $userName }}" placeholder="Enter your full name">
                     </div>
 
                     <div class="profile-field">
                         <label class="profile-label">Email</label>
-                        <input type="email" name="email" class="profile-input" value="<?= escape($userEmail) ?>" placeholder="name@example.com">
+                        <input type="email" name="email" class="profile-input" value="{{ $userEmail }}" placeholder="name@example.com">
                     </div>
 
                     <div class="profile-field">
                         <label class="profile-label">Telephone</label>
-                        <input type="text" name="telephone" class="profile-input" value="<?= escape($userPhone) ?>" placeholder="e.g. 08123456789">
+                        <input type="text" name="telephone" class="profile-input" value="{{ $userPhone }}" placeholder="e.g. 08123456789">
                     </div>
 
                     <div class="profile-actions">
@@ -502,10 +513,20 @@ if (isset($courses) && is_iterable($courses)) {
             </div>
 
             <div class="content-card" style="margin-top: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="color: #2D2A43; font-size: 1.5rem; font-weight: 800; margin: 0;">Grafik Kunjungan Profil</h3>
+                    <a href="/user/{{ $user['id'] ?? '' }}" target="_blank" style="background: #F3F4F6; color: #4B5563; padding: 8px 16px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: 700; transition: background 0.2s;" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background='#F3F4F6'">Lihat Profil Publik</a>
+                </div>
+                <div style="width: 100%; height: 300px;">
+                    <canvas id="profileVisitsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="content-card" style="margin-top: 24px;">
                 <h3 style="color: #2D2A43; font-size: 1.5rem; font-weight: 800; margin: 0 0 16px 0;">Materi yang Diupload</h3>
-                <?php if (!empty($userMaterials) && count($userMaterials) > 0): ?>
+                @if(!empty($userMaterials) && count($userMaterials) > 0)
                     <div style="display: grid; gap: 16px;">
-                        <?php 
+                        @php 
                         $modulColors = [
                             ['bg' => '#F8F5FF', 'border' => '#E9E2FF', 'text' => '#4E4260'], // Purple
                             ['bg' => '#F0FDF4', 'border' => '#BBF7D0', 'text' => '#166534'], // Green
@@ -516,30 +537,34 @@ if (isset($courses) && is_iterable($courses)) {
                             ['bg' => '#F0F9FF', 'border' => '#BAE6FD', 'text' => '#075985']  // Sky Blue
                         ];
                         $colorIndex = 0;
-                        ?>
-                        <?php foreach ($userMaterials as $material): 
-                            $colorTheme = $modulColors[$colorIndex % count($modulColors)];
-                            $colorIndex++;
-                        ?>
-                            <div style="border: 1px solid <?= $colorTheme['border'] ?>; border-radius: 16px; padding: 16px; background: <?= $colorTheme['bg'] ?>; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; transition: transform 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        @endphp
+                        @foreach ($userMaterials as $material)
+@php $colorTheme = $modulColors[$colorIndex % count($modulColors)];
+                            $colorIndex++; @endphp
+                            <div style="border: 1px solid {{ $colorTheme['border'] }}; border-radius: 16px; padding: 16px; background: {{ $colorTheme['bg'] }}; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; transition: transform 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                                 <div>
-                                    <h4 style="margin: 0; font-size: 1.1rem; color: <?= $colorTheme['text'] ?>; font-weight: 800;"><?= escape($material->judul) ?></h4>
+                                    <h4 style="margin: 0; font-size: 1.1rem; color: {{ $colorTheme['text'] }}; font-weight: 800;">{{ $material->judul }}</h4>
                                     <p style="margin: 4px 0 0; font-size: 0.9rem; color: #718096; font-weight: 600;">
-                                        Course: <?= escape($courseMap[$material->course_id] ?? 'Unknown Course') ?>
+                                        Course: {{ $courseMap[$material->course_id] ?? 'Unknown Course' }}
                                     </p>
                                 </div>
-                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                    <a href="/home/previewMaterial/<?= escape($material->id) ?>" target="_blank" style="background: #10B981; color: white; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: opacity 0.2s ease;">Lihat PDF</a>
-                                    <a href="/materials/<?= escape($material->id) ?>/edit" style="background: #6366F1; color: white; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: opacity 0.2s ease;">Edit Material</a>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                                    <a href="/home/previewMaterial/{{ $material->id }}" target="_blank" style="background: #10B981; color: white; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: opacity 0.2s ease;">Lihat PDF</a>
+                                    <a href="/materials/{{ $material->id }}/edit" style="background: #6366F1; color: white; padding: 10px 18px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: opacity 0.2s ease;">Edit Material</a>
+                                    <form action="/materials/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus materi ini?');" style="margin: 0;">
+                                        @php if (function_exists('csrf_field')) echo csrf_field(); @endphp
+                                        <input type="hidden" name="id" value="{{ $material->id }}">
+                                        <button type="submit" style="background: #EF4444; color: white; border: none; padding: 10px 18px; border-radius: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: opacity 0.2s ease;">Delete</button>
+                                    </form>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                        @endforeach
                     </div>
-                <?php else: ?>
+                @else
                     <div style="border: 2px dashed #E2E8F0; border-radius: 16px; padding: 32px; text-align: center; color: #A0AEC0; font-weight: 600;">
                         Belum ada materi yang diupload.
                     </div>
-                <?php endif; ?>
+                @endif
             </div>
         </section>
     </div>
@@ -567,3 +592,49 @@ function previewImage(event) {
     reader.readAsDataURL(file);
 }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/profile-visits')
+        .then(response => response.json())
+        .then(data => {
+            if(data.error) return;
+            const ctx = document.getElementById('profileVisitsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Kunjungan',
+                        data: data.data,
+                        borderColor: '#7C3AED',
+                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#FFFFFF',
+                        pointBorderColor: '#7C3AED',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, precision: 0 }
+                        }
+                    }
+                }
+            });
+        });
+});
+</script>
+@endsection

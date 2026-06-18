@@ -1,4 +1,6 @@
-<?php
+@extends('layouts.main')
+@section('content')
+@php
 /* @var string $title */
 /* @var string $name */
 /* @var string $page */
@@ -23,6 +25,13 @@ if (isset($courses) && $courses) {
     }
 }
 
+$userMap = [];
+if (isset($users) && $users) {
+    foreach ($users as $u) {
+        $userMap[$u->id] = $u->nama;
+    }
+}
+
 function escape($value) {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
@@ -34,7 +43,7 @@ function formatDate($value) {
     $ts = strtotime($value);
     return $ts ? date('d M Y', $ts) : escape($value);
 }
-?>
+@endphp
 
 <style>
     /* Global Background Layout */
@@ -180,8 +189,8 @@ function formatDate($value) {
                 <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             <div class="flex items-center gap-3">
-                <img src="<?= $userPhoto ? escape($userPhoto) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' ?>" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-purple-200" />
-                <span class="font-bold text-slate-800 text-sm"><?= $userName ? escape($userName) : 'Kim Jennie' ?></span>
+                <img src="{{ $userPhoto ? escape($userPhoto) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-purple-200" />
+                <span class="font-bold text-slate-800 text-sm">{{ $userName ? escape($userName) : 'Kim Jennie' }}</span>
             </div>
         </div>
     </header>
@@ -238,9 +247,9 @@ function formatDate($value) {
             </section>
 
             <section id="downloadContainer" class="space-y-3.5">
-                <?php if (isset($materials) && $materials && count($materials) > 0): ?>
-                    <?php foreach ($materials as $material): 
-                        $courseName = $courseMap[$material->course_id ?? ''] ?? 'Course Material';
+                @if(isset($materials) && $materials && count($materials) > 0)
+                    @foreach ($materials as $material)
+@php $courseName = $courseMap[$material->course_id ?? ''] ?? 'Course Material';
                         $categoryName = $categoryMap[$material->kategori_id ?? ''] ?? 'General';
                         $dateText = formatDate($material->tanggal_upload ?? $material->updated_at ?? '');
                         
@@ -253,19 +262,23 @@ function formatDate($value) {
                             $iconVisual = '💻';
                         } elseif (strpos($cleanTitle, 'design') !== false || strpos($cleanTitle, 'ui') !== false) {
                             $iconVisual = '🎨';
-                        }
-                    ?>
+                        } @endphp
                         <div class="download-list-row p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-purple-100/40">
                             <div class="flex items-center gap-4">
                                 <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center text-3xl shadow-sm border border-purple-50">
-                                    <?= $iconVisual ?>
+                                    {{ $iconVisual }}
                                 </div>
                                 <div class="space-y-0.5">
                                     <h3 class="text-base font-bold text-slate-800 tracking-tight">
-                                        <?= escape($material->judul ?? 'Untitled Material') ?>
+                                        {{ $material->judul ?? 'Untitled Material' }}
                                     </h3>
+                                    @if(!empty($material->user_id) && isset($userMap[$material->user_id]))
+                                    <a href="/user/{{ $material->user_id }}" class="text-xs font-semibold text-purple-600 hover:text-purple-800 underline block mt-0.5 mb-1 transition-colors">
+                                        Oleh: {{ $userMap[$material->user_id] }}
+                                    </a>
+                                    @endif
                                     <p class="text-xs font-semibold text-slate-400">
-                                        3.2 MB • Downloaded on <?= escape($dateText) ?>
+                                        3.2 MB • Downloaded on {{ $dateText }}
                                     </p>
                                 </div>
                             </div>
@@ -276,12 +289,12 @@ function formatDate($value) {
                                 </button>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
+                    @endforeach
+                @else
                     <div class="download-list-row p-8 text-center text-sm font-medium text-slate-400">
                         Belum ada riwayat berkas yang diunduh.
                     </div>
-                <?php endif; ?>
+                @endif
             </section>
 
             <footer class="pt-4 flex justify-end">
@@ -314,3 +327,4 @@ function formatDate($value) {
     searchInput?.addEventListener('input', filterDownloads);
 })();
 </script>
+@endsection

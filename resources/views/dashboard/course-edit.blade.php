@@ -1,8 +1,10 @@
-<?php
+@extends('layouts.main')
+@section('content')
+@php
 /* @var object $course */
 /* @var array $categories */
 function escape($v){ return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
-?>
+@endphp
 
 <style>
     .form-card { background:#fff;border-radius:16px;padding:24px;border:1px solid #EEF2FF; box-shadow:0 20px 40px rgba(15,23,42,0.04); }
@@ -16,36 +18,39 @@ function escape($v){ return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         <h1 class="text-2xl font-bold mb-4">Edit Course</h1>
 
         <div class="form-card">
-            <form action="/course/<?= escape($course->id) ?>/update" method="post">
-                <?= csrf_field() ?>
+            <form action="/course/{{ $course->id }}/update" method="post">
+                {{ csrf_field() }}
 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-2">Title</label>
-                    <input name="title" class="input" value="<?= escape($course->nama_course ?? '') ?>" required />
+                    <input name="title" class="input" value="{{ $course->nama_course ?? '' }}" required />
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-2">Category</label>
                     <select name="category" class="input">
                         <option value="">-- Select category --</option>
-                        <?php if (isset($categories) && $categories): foreach ($categories as $cat): ?>
-                            <option value="<?= escape($cat->kategori_id) ?>" <?= (!empty($course->kategori_id) && $course->kategori_id == $cat->kategori_id) ? 'selected' : '' ?>>
-                                <?= escape($cat->nama_kategori ?? $cat->name ?? '') ?>
+                        @if(isset($categories) && $categories)
+@foreach($categories as $cat)
+                            <option value="{{ $cat->kategori_id }}" {{ (!empty($course->kategori_id) && $course->kategori_id == $cat->kategori_id) ? 'selected' : '' }}>
+                                {{ $cat->nama_kategori ?? $cat->name ?? '' }}
                             </option>
-                        <?php endforeach; endif; ?>
+                        @endforeach
+@endif
                     </select>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-2">Description</label>
-                    <textarea name="description" rows="6" class="input"><?= escape($course->deskripsi ?? '') ?></textarea>
+                    <textarea name="description" rows="6" class="input">{{ $course->deskripsi ?? '' }}</textarea>
                 </div>
 
                 <div class="flex gap-3 justify-end">
-                    <a href="/course/<?= escape($course->id) ?>" class="btn-cancel">Cancel</a>
+                    <a href="/course/{{ $course->id }}" class="btn-cancel">Cancel</a>
                     <button type="submit" class="btn-save">Save Changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+@endsection

@@ -1,4 +1,6 @@
-<?php
+@extends('layouts.main')
+@section('content')
+@php
 /* @var string $title */
 /* @var string $name */
 /* @var string $page */
@@ -16,10 +18,17 @@ if (isset($categories) && $categories) {
     }
 }
 
+$userMap = [];
+if (isset($users) && $users) {
+    foreach ($users as $u) {
+        $userMap[$u->id] = $u->nama;
+    }
+}
+
 function escape($value) {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
-?>
+@endphp
 
 <style>
     /* Global Background EduShare */
@@ -231,8 +240,8 @@ function escape($value) {
                 <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             <div class="flex items-center gap-3">
-                <img src="<?= $userPhoto ? escape($userPhoto) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' ?>" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-purple-200" />
-                <span class="font-bold text-slate-800 text-sm"><?= $userName ? escape($userName) : 'Kim Jennie' ?></span>
+                <img src="{{ $userPhoto ? escape($userPhoto) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80' }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-purple-200" />
+                <span class="font-bold text-slate-800 text-sm">{{ $userName ? escape($userName) : 'Kim Jennie' }}</span>
             </div>
         </div>
     </header>
@@ -268,25 +277,25 @@ function escape($value) {
         </aside>
 
         <main class="p-8 space-y-8">
-            <?php if (session()->has('success')): ?>
+            @if(session()->has('success'))
                 <div id="success-alert" class="alert-box alert-success">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.25rem;">✨</span>
-                        <span><?= escape(session('success')) ?></span>
+                        <span>{{ session('success') }}</span>
                     </div>
                     <button onclick="document.getElementById('success-alert').remove()" class="alert-close">✕</button>
                 </div>
-            <?php endif; ?>
+            @endif
 
-            <?php if (session()->has('error')): ?>
+            @if(session()->has('error'))
                 <div id="error-alert" class="alert-box alert-error">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.25rem;">⚠️</span>
-                        <span><?= escape(session('error')) ?></span>
+                        <span>{{ session('error') }}</span>
                     </div>
                     <button onclick="document.getElementById('error-alert').remove()" class="alert-close">✕</button>
                 </div>
-            <?php endif; ?>
+            @endif
 
             <div class="hero-banner p-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-center min-h-[180px]">
                 <div class="space-y-3 z-10 text-center md:text-left">
@@ -309,19 +318,15 @@ function escape($value) {
             <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div class="flex flex-wrap gap-2 items-center">
                     <button class="btn-filter active">All</button>
-                    <button class="btn-filter" data-category="database">Data Base</button>
-                    <button class="btn-filter" data-category="programming">Programming</button>
-                    <button class="btn-filter" data-category="design">UI/UX Design</button>
                     
-                    <?php if (isset($categories) && $categories): foreach ($categories as $cat): ?>
-                        <button class="btn-filter" data-category="<?= escape($cat->kategori_id) ?>">
-                            <?= escape($cat->nama_kategori ?? $cat->name ?? $cat->nama ?? 'Category') ?>
-                        </button>
-                    <?php endforeach; endif; ?>
+                    @if(isset($categories) && count($categories) > 0)
+                        @foreach ($categories as $cat)
+                            <button class="btn-filter" data-category="{{ $cat->nama_kategori ?? $cat->name ?? $cat->nama ?? 'Category' }}">
+                                {{ $cat->nama_kategori ?? $cat->name ?? $cat->nama ?? 'Category' }}
+                            </button>
+                        @endforeach
+                    @endif
 
-                    <button onclick="toggleCategoryModal(true)" type="button" class="bg-purple-100 text-purple-700 font-bold px-4 py-2 rounded-lg transition hover:bg-purple-200 text-sm">
-                        + Kategori
-                    </button>
                 </div>
 
                 <div class="search-wrapper flex items-center gap-3 px-4 py-2 w-full max-w-xs">
@@ -331,9 +336,9 @@ function escape($value) {
             </section>
 
             <section class="space-y-6">
-                <?php if (isset($courses) && $courses && count($courses) > 0): ?>
+                @if(isset($courses) && $courses && count($courses) > 0)
                     <div id="courseGrid" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        <?php 
+                        @php 
                         $gradients = [
                             'card-gradient-programming',
                             'card-gradient-design',
@@ -344,44 +349,62 @@ function escape($value) {
                             'card-gradient-prototyping',
                             'card-gradient-relational'
                         ];
-                        foreach ($courses as $index => $course): 
+                        @endphp
+                        @foreach ($courses as $index => $course)
+                            @php
                             $gradientClass = $gradients[$index % count($gradients)];
-                        ?>
-                            <article class="course-item-card <?= $gradientClass ?> flex flex-col justify-between min-h-[190px]">
-                                <div class="p-5 flex justify-between items-start">
-                                    <div class="text-white space-y-2">
-                                        <h3 class="text-xl font-bold tracking-tight">
-                                            <?= escape($course->nama_course ?? $course->title ?? 'Untitled Course') ?>
-                                        </h3>
-                                        <span class="badge-category inline-block">
-                                            <?= escape($categoryMap[$course->kategori_id ?? ''] ?? 'Course Material') ?>
-                                        </span>
-                                    </div>
-                                    <div class="text-4xl opacity-90 filter drop-shadow">
-                                        <?php if(strpos($gradientClass, 'database') !== false || strpos($gradientClass, 'relational') !== false): ?>
-                                            🗄️
-                                        <?php elseif(strpos($gradientClass, 'design') !== false || strpos($gradientClass, 'prototyping') !== false): ?>
-                                            🎨
-                                        <?php else: ?>
-                                            💻
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <?php 
+                            @endphp
+                            <article class="course-item-card {{ $gradientClass }} flex flex-col justify-between min-h-[190px]">
+                                @php 
                                 $materiId = '';
+                                $activeKategoriId = $course->kategori_id ?? '';
+                                $uploaderId = $course->created_by ?? '';
                                 if (isset($materials)) {
                                     foreach ($materials as $m) {
                                         if ($m->course_id == ($course->id ?? '')) {
                                             $materiId = $m->id;
+                                            if (empty($activeKategoriId) && !empty($m->kategori_id)) {
+                                                $activeKategoriId = $m->kategori_id;
+                                            }
+                                            if (!empty($m->user_id)) {
+                                                $uploaderId = $m->user_id;
+                                            }
                                             break;
                                         }
                                     }
                                 }
                                 $detailLink = $materiId ? "/home/previewMaterial/" . escape($materiId) : "/course/" . escape($course->id ?? '');
-                                ?>
+                                @endphp
+                                <div class="p-5 flex justify-between items-start">
+                                    <div class="text-white space-y-2">
+                                        <h3 class="text-xl font-bold tracking-tight">
+                                            {{ $course->nama_course ?? $course->title ?? 'Untitled Course' }}
+                                        </h3>
+                                        <div class="mt-2">
+                                            <span class="badge-category inline-block mb-2">
+                                                {{ $categoryMap[$activeKategoriId] ?? 'Course Material' }}
+                                            </span>
+                                            
+                                            @if(!empty($uploaderId) && isset($userMap[$uploaderId]))
+                                            <a href="/user/{{ $uploaderId }}" style="font-size: 0.85rem; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 6px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Kunjungi profil">
+                                                <span>👤</span> {{ $userMap[$uploaderId] }}
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="text-4xl opacity-90 filter drop-shadow">
+                                        @if(strpos($gradientClass, 'database') !== false || strpos($gradientClass, 'relational') !== false)
+                                            🗄️
+                                        @elseif(strpos($gradientClass, 'design') !== false || strpos($gradientClass, 'prototyping') !== false)
+                                            🎨
+                                        @else
+                                            💻
+                                        @endif
+                                    </div>
+                                </div>
+
                                 <div class="bg-white px-5 py-4 flex items-center justify-between border-t border-slate-50">
-                                    <a href="<?= $detailLink ?>" <?= $materiId ? 'target="_blank"' : '' ?> class="btn-card-detail">
+                                    <a href="{{ $detailLink }}" {{ $materiId ? 'target="_blank"' : '' }} class="btn-card-detail">
                                         Detail
                                     </a>
                                     <button type="button" class="btn-card-download">
@@ -389,13 +412,13 @@ function escape($value) {
                                     </button>
                                 </div>
                             </article>
-                        <?php endforeach; ?>
+                        @endforeach
                     </div>
-                <?php else: ?>
+                @else
                     <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-12 text-center">
                         <p class="text-sm text-slate-400 font-medium">Belum ada course yang tersedia saat ini.</p>
                     </div>
-                <?php endif; ?>
+                @endif
             </section>
 
             <footer class="pt-6 flex justify-end gap-3">
@@ -419,7 +442,7 @@ function escape($value) {
         </div>
 
         <form action="/kategori/create" method="post" class="space-y-4">
-            <?= csrf_field() ?>
+            {{ csrf_field() }}
             <div>
                 <label class="block text-sm font-semibold text-slate-600 mb-2">Nama Kategori</label>
                 <input name="name" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 outline-none focus:border-purple-500 focus:bg-white transition" placeholder="Masukkan nama kategori baru..." required />
@@ -500,3 +523,4 @@ window.addEventListener('click', function (e) {
     searchInput?.addEventListener('input', filterCourses);
 })();
 </script>
+@endsection

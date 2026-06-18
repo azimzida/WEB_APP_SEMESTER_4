@@ -55,6 +55,12 @@ class BaseController extends Controller
         }
     }
 
+    protected function renderBladeView(string $view, array $data = [])
+    {
+        $data = $this->prepareViewData($data);
+        return view($view, $data);
+    }
+
     protected function renderLegacyView(string $view, array $data = [])
     {
         $data = $this->prepareViewData($data);

@@ -35,6 +35,8 @@ Route::get('/home/previewMaterial/{id}', [App\Http\Controllers\HomeController::c
 Route::get('/home/view_pdf/{id}', [App\Http\Controllers\HomeController::class, 'previewMaterial']);
 Route::get('/materials/{id}/edit', [App\Http\Controllers\HomeController::class, 'editMaterialForm']);
 Route::post('/materials/{id}/update', [App\Http\Controllers\HomeController::class, 'updateMaterial']);
+Route::get('/user/{id}', [App\Http\Controllers\HomeController::class, 'publicProfile']);
+Route::get('/api/profile-visits', [App\Http\Controllers\HomeController::class, 'getProfileVisitsData']);
 
 Route::fallback(function () {
     $dbStatus = true;

@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Course;
+use App\Models\Kategori;
+use App\Models\Materi;
+use App\Models\ProfileVisit;
+use App\Models\User;
 
 class HomeController extends BaseController
 {
@@ -16,7 +21,7 @@ class HomeController extends BaseController
             return redirect('/dashboard');
         }
 
-        return $this->renderLegacyView('dashboard/guest', [
+        return $this->renderBladeView('dashboard.guest', [
             'title' => config('app.name'),
             'page' => 'guest',
             'message' => 'Welcome to Edu Share. Please login or register to continue.',
@@ -25,7 +30,7 @@ class HomeController extends BaseController
 
     public function index()
     {
-        return $this->renderLegacyView('dashboard/index', [
+        return $this->renderBladeView('dashboard.index', [
             'title' => config('app.name'),
             'page' => 'beranda',
             'message' => 'Ini adalah halaman beranda Edu Share.',
@@ -34,7 +39,7 @@ class HomeController extends BaseController
 
     public function about()
     {
-        return $this->renderLegacyView('dashboard/about', [
+        return $this->renderBladeView('dashboard.about', [
             'title' => 'Tentang Kami - ' . config('app.name'),
             'page' => 'tentang',
             'message' => 'Ini adalah halaman Tentang Kami untuk aplikasi Edu Share.',
@@ -43,42 +48,47 @@ class HomeController extends BaseController
 
     public function courses()
     {
-        $categories = DB::table('kategori')->get();
-        $courses = DB::table('course')->get();
-        $materials = DB::table('materi')->get();
+        $categories = Kategori::query()->get();
+        $courses = Course::query()->get();
+        $materials = Materi::query()->get();
+        $users = User::query()->get();
 
-        return $this->renderLegacyView('dashboard/courses', [
+        return $this->renderBladeView('dashboard.courses', [
             'title' => 'Courses - ' . config('app.name'),
             'page' => 'courses',
             'message' => 'Ini adalah halaman Courses untuk aplikasi Edu Share.',
             'categories' => $categories,
             'courses' => $courses,
             'materials' => $materials,
+            'users' => $users,
         ]);
     }
 
 public function courseDetail($id)
 {
-    $categories = DB::table('kategori')->get();
-    $course = DB::table('course')->where('id', $id)->first();
+    $categories = Kategori::query()->get();
+    $course = Course::query()->where('id', $id)->first();
+    $users = User::query()->get();
 
     if (!$course) {
-        return $this->renderLegacyView('dashboard/course-detail', [
+        return $this->renderBladeView('dashboard.course-detail', [
             'title' => 'Detail Material - ' . config('app.name'),
             'page' => 'course-detail',
             'notFound' => true,
             'categories' => $categories,
+            'users' => $users,
         ]);
     }
 
-    $materials = DB::table('materi')->where('course_id', $id)->get();
+    $materials = Materi::query()->where('course_id', $id)->get();
 
-    return $this->renderLegacyView('dashboard/course-detail', [
+    return $this->renderBladeView('dashboard.course-detail', [
         'title' => 'Detail Material - ' . config('app.name'),
         'page' => 'course-detail',
         'course' => $course,
         'categories' => $categories,
         'materials' => $materials,
+        'users' => $users,
     ]);
 }
 
@@ -93,7 +103,7 @@ public function courseDetail($id)
         ]);
 
         try {
-            DB::table('kategori')->insert([
+            Kategori::query()->insert([
                 'kategori_id' => Str::random(20),
                 'nama_kategori' => $data['name'],
                 'slug' => Str::slug($data['name']),
@@ -131,7 +141,7 @@ public function courseDetail($id)
                 $insert['kategori_id'] = $data['category'];
             }
 
-            DB::table('course')->insert($insert);
+            Course::query()->insert($insert);
 
             return redirect('/home/courses')->with('success', 'Course berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -159,12 +169,12 @@ public function courseDetail($id)
         $courseId = null;
         $courseName = trim($data['course'] ?? '');
         if ($courseName !== '') {
-            $existingCourse = DB::table('course')->where('nama_course', $courseName)->first();
+            $existingCourse = Course::query()->where('nama_course', $courseName)->first();
             if ($existingCourse) {
                 $courseId = $existingCourse->id;
             } else {
                 $courseId = Str::random(20);
-                DB::table('course')->insert([
+                Course::query()->insert([
                     'id' => $courseId,
                     'nama_course' => $courseName,
                     'created_by' => $this->getAuthenticatedUser()['id'] ?? null,
@@ -175,7 +185,7 @@ public function courseDetail($id)
         }
  
         try {
-            DB::table('materi')->insert([
+            Materi::query()->insert([
                 'id' => Str::random(20),
                 'user_id' => $this->getAuthenticatedUser()['id'] ?? null,
                 'course_id' => $courseId,
@@ -201,12 +211,12 @@ public function courseDetail($id)
         $categories = [];
         
         if ($user) {
-            $userMaterials = DB::table('materi')->where('user_id', $user['id'])->get();
-            $courses = DB::table('course')->get();
-            $categories = DB::table('kategori')->get();
+            $userMaterials = Materi::query()->where('user_id', $user['id'])->get();
+            $courses = Course::query()->get();
+            $categories = Kategori::query()->get();
         }
 
-        return $this->renderLegacyView('dashboard/profile', [
+        return $this->renderBladeView('dashboard.profile', [
             'title' => 'Profil Saya - ' . config('app.name'),
             'page' => 'profil',
             'message' => 'Halaman profil sementara untuk melihat data akun dan status profil.',
@@ -253,7 +263,7 @@ public function courseDetail($id)
             return redirect('/login');
         }
 
-        DB::table('users')->where('id', $user['id'])->update(['foto_profil' => $binaryData]);
+        User::query()->where('id', $user['id'])->update(['foto_profil' => $binaryData]);
 
         return redirect('/profile');
     }
@@ -269,7 +279,7 @@ public function courseDetail($id)
             return redirect('/login');
         }
 
-        DB::table('users')->where('id', $user['id'])->update(['foto_profil' => null]);
+        User::query()->where('id', $user['id'])->update(['foto_profil' => null]);
 
         return redirect('/profile');
     }
@@ -292,7 +302,7 @@ public function courseDetail($id)
         ]);
 
         // Check if email already exists for another user
-        $emailExists = DB::table('users')
+        $emailExists = User::query()
             ->where('email', $data['email'])
             ->where('id', '!=', $user['id'])
             ->exists();
@@ -302,7 +312,7 @@ public function courseDetail($id)
         }
 
         try {
-            DB::table('users')
+            User::query()
                 ->where('id', $user['id'])
                 ->update([
                     'nama' => $data['name'],
@@ -324,10 +334,10 @@ public function courseDetail($id)
             return redirect('/login');
         }
 
-        $categories = DB::table('kategori')->get();
-        $courses = DB::table('course')->get();
+        $categories = Kategori::query()->get();
+        $courses = Course::query()->get();
 
-        return $this->renderLegacyView('dashboard/upload', [
+        return $this->renderBladeView('dashboard.upload', [
             'title' => 'Upload Materi - ' . config('app.name'),
             'page' => 'upload-material',
             'message' => 'Upload materi pembelajaran baru.',
@@ -342,14 +352,14 @@ public function courseDetail($id)
             return redirect('/login');
         }
 
-        $course = DB::table('course')->where('id', $id)->first();
+        $course = Course::query()->where('id', $id)->first();
         if (!$course) {
             return redirect('/home/courses')->with('error', 'Course tidak ditemukan.');
         }
 
-        $categories = DB::table('kategori')->get();
+        $categories = Kategori::query()->get();
 
-        return $this->renderLegacyView('dashboard/course-edit', [
+        return $this->renderBladeView('dashboard.course-edit', [
             'title' => 'Edit Course - ' . config('app.name'),
             'page' => 'edit-course',
             'course' => $course,
@@ -379,7 +389,7 @@ public function courseDetail($id)
                 $update['kategori_id'] = $data['category'];
             }
 
-            DB::table('course')->where('id', $id)->update($update);
+            Course::query()->where('id', $id)->update($update);
 
             return redirect('/home/courses')->with('success', 'Course berhasil diperbarui.');
         } catch (\Exception $e) {
@@ -394,7 +404,7 @@ public function courseDetail($id)
         }
 
         try {
-            DB::table('course')->where('id', $id)->delete();
+            Course::query()->where('id', $id)->delete();
             return redirect('/home/courses')->with('success', 'Course berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect('/home/courses')->with('error', 'Gagal menghapus course: ' . $e->getMessage());
@@ -407,7 +417,7 @@ public function courseDetail($id)
             return redirect('/login');
         }
 
-        $material = DB::table('materi')->where('id', $id)->first();
+        $material = Materi::query()->where('id', $id)->first();
         if (!$material) {
             return redirect('/home/courses')->with('error', 'Materi tidak ditemukan.');
         }
@@ -417,11 +427,11 @@ public function courseDetail($id)
             return redirect('/home/courses')->with('error', 'Anda tidak berhak mengedit materi ini.');
         }
 
-        $categories = DB::table('kategori')->get();
-        $courses = DB::table('course')->get();
-        $course = $material->course_id ? DB::table('course')->where('id', $material->course_id)->first() : null;
+        $categories = Kategori::query()->get();
+        $courses = Course::query()->get();
+        $course = $material->course_id ? Course::query()->where('id', $material->course_id)->first() : null;
 
-        return $this->renderLegacyView('dashboard/material-edit', [
+        return $this->renderBladeView('dashboard.material-edit', [
             'title' => 'Edit Materi - ' . config('app.name'),
             'page' => 'edit-material',
             'material' => $material,
@@ -437,7 +447,7 @@ public function courseDetail($id)
             return redirect('/login');
         }
 
-        $material = DB::table('materi')->where('id', $id)->first();
+        $material = Materi::query()->where('id', $id)->first();
         if (!$material) {
             return redirect('/home/courses')->with('error', 'Materi tidak ditemukan.');
         }
@@ -473,14 +483,14 @@ public function courseDetail($id)
         }
 
         try {
-            DB::table('materi')->where('id', $id)->update($update);
+            Materi::query()->where('id', $id)->update($update);
             
             if ($material->course_id && !empty($data['course_name'])) {
                 $courseUpdate = ['nama_course' => $data['course_name']];
                 if (!empty($data['category']) && Schema::hasColumn('course', 'kategori_id')) {
                     $courseUpdate['kategori_id'] = $data['category'];
                 }
-                DB::table('course')->where('id', $material->course_id)->update($courseUpdate);
+                Course::query()->where('id', $material->course_id)->update($courseUpdate);
             }
             
             return redirect('/profile')->with('success', 'Materi berhasil diperbarui.');
@@ -498,12 +508,21 @@ public function courseDetail($id)
         $materialId = $request->input('id');
 
         try {
-            $material = DB::table('materi')->where('id', $materialId)->first();
+            $material = Materi::query()->where('id', $materialId)->first();
             if ($material && Storage::disk('public')->exists($material->file_materi)) {
                 Storage::disk('public')->delete($material->file_materi);
             }
 
-            DB::table('materi')->where('id', $materialId)->delete();
+            $courseId = $material ? $material->course_id : null;
+            Materi::query()->where('id', $materialId)->delete();
+
+            if ($courseId) {
+                $count = Materi::query()->where('course_id', $courseId)->count();
+                if ($count === 0) {
+                    Course::query()->where('id', $courseId)->delete();
+                }
+            }
+
             return redirect()->back()->with('success', 'Materi berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus materi: ' . $e->getMessage());
@@ -512,7 +531,7 @@ public function courseDetail($id)
 
     public function previewMaterial($id)
     {
-        $material = DB::table('materi')->where('id', $id)->first();
+        $material = Materi::query()->where('id', $id)->first();
 
         if (!$material) {
             return redirect('/home/courses')->with('error', 'Materi tidak ditemukan.');
@@ -533,16 +552,93 @@ public function courseDetail($id)
             return $this->previewMaterial($id);
         }
 
-        $categories = DB::table('kategori')->get();
-        $courses = DB::table('course')->get();
-        $materials = DB::table('materi')->get();
+        $categories = Kategori::query()->get();
+        $courses = Course::query()->get();
+        $materials = Materi::query()->get();
+        $users = User::query()->get();
 
-        return $this->renderLegacyView('dashboard/download', [
+        return $this->renderBladeView('dashboard.download', [
             'title' => 'Download Materi - ' . config('app.name'),
             'page' => 'download',
             'categories' => $categories,
             'courses' => $courses,
             'materials' => $materials,
+            'users' => $users,
+        ]);
+    }
+
+    public function publicProfile(Request $request, $id)
+    {
+        $profileUser = User::query()->where('id', $id)->first();
+
+        if (!$profileUser) {
+            return redirect('/home/courses')->with('error', 'User tidak ditemukan.');
+        }
+
+        // Jangan catat kunjungan jika yang berkunjung adalah pemilik profil itu sendiri
+        $loggedInUser = $this->getAuthenticatedUser();
+        $isOwner = $loggedInUser && $loggedInUser['id'] === $profileUser->id;
+
+        if (!$isOwner) {
+            ProfileVisit::query()->insert([
+                'user_id' => $profileUser->id,
+                'visitor_ip' => $request->ip(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $materials = Materi::query()->where('user_id', $profileUser->id)->get();
+        $courses = Course::query()->get();
+
+        return $this->renderBladeView('dashboard.public-profile', [
+            'title' => 'Profil Publik - ' . config('app.name'),
+            'page' => 'public-profile',
+            'profileUser' => $profileUser,
+            'materials' => $materials,
+            'courses' => $courses,
+            'isOwner' => $isOwner,
+            'user' => $loggedInUser
+        ]);
+    }
+
+    public function getProfileVisitsData(Request $request)
+    {
+        $user = $this->getAuthenticatedUser();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Ambil 7 hari terakhir
+        $days = 7;
+        $visits = ProfileVisit::query()
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+            ->where('user_id', $user['id'])
+            ->where('created_at', '>=', now()->subDays($days))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // Siapkan format tanggal dan count default 0
+        $labels = [];
+        $data = [];
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $labels[] = now()->subDays($i)->format('d M');
+            $data[$date] = 0;
+        }
+
+        // Isi dengan data asli
+        foreach ($visits as $visit) {
+            if (isset($data[$visit->date])) {
+                $data[$visit->date] = $visit->count;
+            }
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => array_values($data),
         ]);
     }
 }

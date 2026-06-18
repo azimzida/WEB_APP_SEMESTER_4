@@ -1,4 +1,6 @@
-<?php
+@extends('layouts.main')
+@section('content')
+@php
 /* @var string $title */
 /* @var string $name */
 /* @var string $page */
@@ -13,7 +15,7 @@ $categories = $categories ?? [];
 $materials = $materials ?? [];
 $uploadMessage = $uploadMessage ?? null;
 $uploadSuccess = $uploadSuccess ?? false;
-?>
+@endphp
 
 <style>
     .fade-up {
@@ -54,7 +56,7 @@ $uploadSuccess = $uploadSuccess ?? false;
                 <div class="flex h-12 w-12 items-center justify-center rounded-3xl bg-violet-500 text-xl font-bold text-white">E</div>
                 <div>
                     <div class="mb-2 flex items-center">
-                        <span class="h-3 w-3 rounded-full <?= $dbStatus ? 'bg-emerald-500' : 'bg-rose-500' ?>" title="<?= htmlspecialchars($dbStatus ? 'Database connected' : 'Database disconnected', ENT_QUOTES, 'UTF-8') ?>"></span>
+                        <span class="h-3 w-3 rounded-full {{ $dbStatus ? 'bg-emerald-500' : 'bg-rose-500' }}" title="{{ htmlspecialchars($dbStatus ? 'Database connected' : 'Database disconnected', ENT_QUOTES, 'UTF-8') }}"></span>
                     </div>
                     <p class="fade-up delay-2 text-sm font-semibold uppercase tracking-[0.3em] text-violet-600">Edu Share</p>
                     <p class="fade-up delay-3 text-xs text-slate-500">Learn easier and more structured</p>
@@ -69,33 +71,33 @@ $uploadSuccess = $uploadSuccess ?? false;
                 <a href="/dashboard" class="fade-up delay-2 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">Home</a>
                 <a href="/home/material" class="fade-up delay-3 rounded-full px-4 py-2 bg-violet-600 text-white transition hover:bg-violet-700">Material</a>
                 <a href="/about" class="fade-up delay-4 rounded-full px-4 py-2 bg-slate-100 text-slate-900 transition hover:bg-slate-200">About</a>
-                <?php if ($user): ?>
+                @if($user)
                     <div class="ml-4 flex items-center gap-3">
                         <a href="/profile" class="flex items-center gap-3 rounded-full bg-slate-100 text-slate-900 transition hover:bg-slate-200 px-3 py-2">
-                            <?php if (!empty($userPhoto)): ?>
-                                <img src="<?= htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($userName ?: 'Profile', ENT_QUOTES, 'UTF-8') ?>" class="h-10 w-10 rounded-full object-cover" />
-                            <?php else: ?>
-                                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-sm font-semibold text-white"><?= strtoupper(substr($userName ?? ($user['email'] ?? 'U'), 0, 1)) ?></span>
-                            <?php endif; ?>
-                            <span class="text-sm font-semibold text-slate-900"><?= htmlspecialchars($userName ?? ($user['email'] ?? 'User'), ENT_QUOTES, 'UTF-8') ?></span>
+                            @if(!empty($userPhoto))
+                                <img src="{{ htmlspecialchars($userPhoto, ENT_QUOTES, 'UTF-8') }}" alt="{{ htmlspecialchars($userName ?: 'Profile', ENT_QUOTES, 'UTF-8') }}" class="h-10 w-10 rounded-full object-cover" />
+                            @else
+                                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-sm font-semibold text-white">{{ strtoupper(substr($userName ?? ($user['email'] ?? 'U'), 0, 1)) }}</span>
+                            @endif
+                            <span class="text-sm font-semibold text-slate-900">{{ htmlspecialchars($userName ?? ($user['email'] ?? 'User'), ENT_QUOTES, 'UTF-8') }}</span>
                         </a>
                         <a href="/logout" class="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700">Logout</a>
                     </div>
-                <?php else: ?>
+                @else
                     <div class="ml-4 flex flex-wrap items-center gap-2">
                         <a href="/login" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">Login</a>
                         <a href="/register" class="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700">Register</a>
                     </div>
-                <?php endif; ?>
+                @endif
             </nav>
         </header>
 
         <section class="mt-10">
-            <?php if ($uploadMessage !== null): ?>
-                <div class="mb-6 rounded-3xl border px-5 py-4 text-sm font-medium <?= $uploadSuccess ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800' ?>">
-                    <?= htmlspecialchars($uploadMessage, ENT_QUOTES, 'UTF-8') ?>
+            @if($uploadMessage !== null)
+                <div class="mb-6 rounded-3xl border px-5 py-4 text-sm font-medium {{ $uploadSuccess ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800' }}">
+                    {{ htmlspecialchars($uploadMessage, ENT_QUOTES, 'UTF-8') }}
                 </div>
-            <?php endif; ?>
+            @endif
 
             <div class="fade-up delay-1 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
                 <div>
@@ -133,14 +135,14 @@ $uploadSuccess = $uploadSuccess ?? false;
             <!-- Material Cards Grid -->
             <div id="listMaterialSection" class="list-section">
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <?php if (empty($materials)): ?>
+                @if(empty($materials))
                     <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
                         <h2 class="text-2xl font-bold text-slate-900">Belum ada materi tersedia</h2>
                         <p class="mt-3 text-slate-600">Silakan tambah materi di database terlebih dahulu, lalu muat ulang halaman ini.</p>
                     </div>
-                <?php else: ?>
-                    <?php foreach ($materials as $material): ?>
-                        <?php
+                @else
+                    @foreach($materials as $material)
+                        @php
                             $materialTitle = $material['judul'] ?? 'Untitled Material';
                             $materialDescription = $material['deskripsi'] ?? '';
                             $courseTitle = $material['course_title'] ?? $material['nama_course'] ?? 'Course';
@@ -171,94 +173,94 @@ $uploadSuccess = $uploadSuccess ?? false;
                                 $badgeText = 'text-purple-700';
                                 $icon = '🎨';
                             }
-                        ?>
+                        @endphp
 
                         <div class="list-item pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
-                            <div class="h-32 bg-gradient-to-br <?= $gradientClass ?> flex items-center justify-center relative overflow-hidden">
+                            <div class="h-32 bg-gradient-to-br {{ $gradientClass }} flex items-center justify-center relative overflow-hidden">
                                 <div class="absolute inset-0 opacity-10 bg-pattern"></div>
-                                <span class="text-5xl relative z-10"><?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?></span>
+                                <span class="text-5xl relative z-10">{{ htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') }}</span>
                             </div>
                             <div class="p-6">
                                 <div class="flex items-center gap-2 mb-3">
-                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold <?= $badgeBg ?> <?= $badgeText ?>"><?= htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') ?></span>
-                                    <?php if ($type === 'video'): ?>
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $badgeBg }} {{ $badgeText }}">{{ htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') }}</span>
+                                    @if($type === 'video')
                                         <span class="inline-block rounded-full bg-red-100 px-3 py-1 text-[11px] font-semibold text-red-700">YouTube</span>
-                                    <?php else: ?>
+                                    @else
                                         <span class="inline-block rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-700">PDF</span>
-                                    <?php endif; ?>
+                                    @endif
                                 </div>
-                                <h3 class="text-lg font-bold text-slate-900"><?= htmlspecialchars($materialTitle, ENT_QUOTES, 'UTF-8') ?></h3>
-                                <p class="mt-2 text-sm text-slate-600"><?= htmlspecialchars($materialDescription ?: 'Deskripsi belum tersedia.', ENT_QUOTES, 'UTF-8') ?></p>
+                                <h3 class="text-lg font-bold text-slate-900">{{ htmlspecialchars($materialTitle, ENT_QUOTES, 'UTF-8') }}</h3>
+                                <p class="mt-2 text-sm text-slate-600">{{ htmlspecialchars($materialDescription ?: 'Deskripsi belum tersedia.', ENT_QUOTES, 'UTF-8') }}</p>
                                 <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                    <span class="text-sm font-medium text-slate-500"><?= htmlspecialchars($courseTitle, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="text-sm font-medium text-slate-500">{{ htmlspecialchars($courseTitle, ENT_QUOTES, 'UTF-8') }}</span>
                                     <div class="flex flex-wrap gap-2">
-                                        <?php if ($type === 'pdf' && $materialId !== ''): ?>
-                                            <a href="/home/previewMaterial/<?= rawurlencode((string) $materialId) ?>" target="_blank" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Preview PDF</a>
-                                        <?php endif; ?>
-                                        <a href="<?= htmlspecialchars($detailUrl, ENT_QUOTES, 'UTF-8') ?>" class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded-full text-sm font-semibold transition inline-block">Detail</a>
+                                        @if($type === 'pdf' && $materialId !== '')
+                                            <a href="/home/previewMaterial/{{ rawurlencode((string) $materialId) }}" target="_blank" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Preview PDF</a>
+                                        @endif
+                                        <a href="{{ htmlspecialchars($detailUrl, ENT_QUOTES, 'UTF-8') }}" class="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded-full text-sm font-semibold transition inline-block">Detail</a>
                                     </div>
                                 </div>
-                                <?php if ($uploadedAt): ?>
-                                    <p class="mt-3 text-xs text-slate-400">Uploaded on <?= htmlspecialchars($uploadedAt, ENT_QUOTES, 'UTF-8') ?></p>
-                                <?php endif; ?>
+                                @if($uploadedAt)
+                                    <p class="mt-3 text-xs text-slate-400">Uploaded on {{ htmlspecialchars($uploadedAt, ENT_QUOTES, 'UTF-8') }}</p>
+                                @endif
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    @endforeach
+                @endif
             </div>
 
             <div id="listCourseSection" class="list-section hidden">
-                <?php if (empty($courses)): ?>
+                @if(empty($courses))
                     <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
                         <h2 class="text-2xl font-bold text-slate-900">Belum ada course tersedia</h2>
                         <p class="mt-3 text-slate-600">Tambahkan course baru dengan tombol + Course.</p>
                     </div>
-                <?php else: ?>
+                @else
                     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <?php foreach ($courses as $course): ?>
-                            <?php
+                        @foreach($courses as $course)
+                            @php
                                 $courseTitle = $course['nama_course'] ?? 'Untitled Course';
                                 $courseDescription = $course['deskripsi'] ?? 'Deskripsi belum tersedia.';
-                            ?>
+                            @endphp
                             <div class="list-item pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
                                 <div class="h-32 bg-slate-100 flex items-center justify-center">
                                     <span class="text-4xl text-violet-500">📚</span>
                                 </div>
                                 <div class="p-6">
-                                    <h3 class="text-lg font-bold text-slate-900"><?= htmlspecialchars($courseTitle, ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <p class="mt-3 text-sm text-slate-600"><?= htmlspecialchars($courseDescription, ENT_QUOTES, 'UTF-8') ?></p>
+                                    <h3 class="text-lg font-bold text-slate-900">{{ htmlspecialchars($courseTitle, ENT_QUOTES, 'UTF-8') }}</h3>
+                                    <p class="mt-3 text-sm text-slate-600">{{ htmlspecialchars($courseDescription, ENT_QUOTES, 'UTF-8') }}</p>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                        @endforeach
                     </div>
-                <?php endif; ?>
+                @endif
             </div>
 
             <div id="listCategorySection" class="list-section hidden">
-                <?php if (empty($categories)): ?>
+                @if(empty($categories))
                     <div class="col-span-full rounded-[1.75rem] border border-slate-100 bg-white p-10 text-center shadow-lg">
                         <h2 class="text-2xl font-bold text-slate-900">Belum ada kategori tersedia</h2>
                         <p class="mt-3 text-slate-600">Tambahkan kategori baru dengan tombol + Category.</p>
                     </div>
-                <?php else: ?>
+                @else
                     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        <?php foreach ($categories as $category): ?>
-                            <?php
+                        @foreach($categories as $category)
+                            @php
                                 $categoryName = $category['nama_kategori'] ?? 'Kategori';
                                 $categorySlug = $category['slug'] ?? '';
-                            ?>
+                            @endphp
                             <div class="list-item pop-in rounded-[1.75rem] overflow-hidden shadow-lg hover:shadow-2xl transition group bg-white border border-slate-100">
                                 <div class="h-32 bg-slate-100 flex items-center justify-center">
                                     <span class="text-4xl text-emerald-500">🏷️</span>
                                 </div>
                                 <div class="p-6">
-                                    <h3 class="text-lg font-bold text-slate-900"><?= htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') ?></h3>
-                                    <p class="mt-3 text-sm text-slate-600"><?= htmlspecialchars($categorySlug, ENT_QUOTES, 'UTF-8') ?></p>
+                                    <h3 class="text-lg font-bold text-slate-900">{{ htmlspecialchars($categoryName, ENT_QUOTES, 'UTF-8') }}</h3>
+                                    <p class="mt-3 text-sm text-slate-600">{{ htmlspecialchars($categorySlug, ENT_QUOTES, 'UTF-8') }}</p>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                        @endforeach
                     </div>
-                <?php endif; ?>
+                @endif
             </div>
 
             <!-- Upload Modal -->
@@ -277,23 +279,23 @@ $uploadSuccess = $uploadSuccess ?? false;
                                 <span class="text-sm font-semibold text-slate-700">Course</span>
                                 <select name="course_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
                                     <option value="">Pilih course...</option>
-                                    <?php if (!empty($courses)): ?>
-                                        <?php foreach ($courses as $c): ?>
-                                            <?php $courseIdValue = $c['id'] ?? $c['course_id'] ?? ''; ?>
-                                            <option value="<?= htmlspecialchars($courseIdValue, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($c['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') ?></option>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
+                                    @if(!empty($courses))
+                                        @foreach($courses as $c)
+                                            @php $courseIdValue = $c['id'] ?? $c['course_id'] ?? ''; @endphp
+                                            <option value="{{ htmlspecialchars($courseIdValue, ENT_QUOTES, 'UTF-8') }}">{{ htmlspecialchars($c['nama_course'] ?? 'Untitled Course', ENT_QUOTES, 'UTF-8') }}</option>
+                                        @endforeach
+                                    @else
                                         <option value="" disabled>Tidak ada course tersedia</option>
-                                    <?php endif; ?>
+                                    @endif
                                 </select>
                             </label>
                             <label class="space-y-2">
                                 <span class="text-sm font-semibold text-slate-700">Category</span>
                                 <select name="kategori_id" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none">
                                     <option value="">Pilih kategori...</option>
-                                    <?php foreach ($categories as $categoryOption): ?>
-                                        <option value="<?= htmlspecialchars($categoryOption['kategori_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($categoryOption['nama_kategori'] ?? $categoryOption['slug'] ?? 'Kategori', ENT_QUOTES, 'UTF-8') ?></option>
-                                    <?php endforeach; ?>
+                                    @foreach($categories as $categoryOption)
+                                        <option value="{{ htmlspecialchars($categoryOption['kategori_id'] ?? '', ENT_QUOTES, 'UTF-8') }}">{{ htmlspecialchars($categoryOption['nama_kategori'] ?? $categoryOption['slug'] ?? 'Kategori', ENT_QUOTES, 'UTF-8') }}</option>
+                                    @endforeach
                                 </select>
                             </label>
                         </div>
@@ -601,3 +603,5 @@ $uploadSuccess = $uploadSuccess ?? false;
         }
     })();
 </script>
+
+@endsection

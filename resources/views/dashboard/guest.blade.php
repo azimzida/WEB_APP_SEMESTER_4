@@ -1,9 +1,11 @@
-<?php
+@extends('layouts.main')
+@section('content')
+@php
 /* @var string $title */
 /* @var string $name */
 /* @var string $page */
 /* @var string $message */
-?>
+@endphp
 
 <div class="min-h-screen bg-slate-100 px-4 py-8 sm:px-6 lg:px-8">
     <div class="mx-auto grid max-w-[1400px] gap-8 xl:grid-cols-[280px_1fr]">
@@ -91,3 +93,5 @@
         </main>
     </div>
 </div>
+
+@endsection
