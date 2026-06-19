@@ -200,16 +200,16 @@ function formatDate($value) {
         <aside class="sidebar-container py-8 flex flex-col justify-between min-h-[calc(100vh-80px)]">
             <div class="space-y-1">
                 <a href="/dashboard" class="sidebar-item-link">
-                    <span class="text-lg">🏠</span> Home
+                    <img src="{{ asset('images/icon_home_edushare.png') }}" alt="Home" class="w-5 h-5 object-contain"> Home
                 </a>
                 <a href="/home/courses" class="sidebar-item-link">
-                    <span class="text-lg">🗂️</span> Course
+                    <img src="{{ asset('images/icon_course_edushare.png') }}" alt="Course" class="w-5 h-5 object-contain"> Course
                 </a>
                 <a href="/download" class="sidebar-item-link active">
-                    <span class="text-lg">📥</span> Download
+                    <img src="{{ asset('images/icon_download_edushare.png') }}" alt="Download" class="w-5 h-5 object-contain"> Download
                 </a>
                 <a href="/profile" class="sidebar-item-link">
-                    <span class="text-lg">👤</span> Profile
+                    <img src="{{ asset('images/icon_profile_edushare.png') }}" alt="Profile" class="w-5 h-5 object-contain"> Profile
                 </a>
             </div>
 
@@ -233,7 +233,7 @@ function formatDate($value) {
                     <p class="text-sm font-medium text-slate-500">Your saved study resources.</p>
                 </div>
                 <div class="hidden md:block pr-6 z-10">
-                    <span class="text-8xl filter drop-shadow-sm">👨‍💻</span>
+                    <img src="{{ asset('images/icon_oranglaptop.png') }}" alt="Ilustrasi Edu Share" class="w-32 md:w-48 object-contain drop-shadow-md">
                 </div>
             </div>
 

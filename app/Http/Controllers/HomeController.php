@@ -411,6 +411,7 @@ public function courseDetail($id)
         }
     }
 
+    //gak dipake ini gajadi
     public function editMaterialForm($id)
     {
         if (!session()->has('user_email')) {
@@ -441,6 +442,7 @@ public function courseDetail($id)
         ]);
     }
 
+    //update ata edit materi di halaman profil
     public function updateMaterial(Request $request, $id)
     {
         if (!session()->has('user_email')) {
@@ -498,7 +500,8 @@ public function courseDetail($id)
             return redirect("/materials/$id/edit")->with('error', 'Gagal memperbarui materi: ' . $e->getMessage());
         }
     }
-
+    
+    // Query Delete Materi di halaman profil
     public function deleteMaterial(Request $request)
     {
         if (!session()->has('user_email') || !$request->isMethod('post')) {
@@ -529,6 +532,7 @@ public function courseDetail($id)
         }
     }
 
+    // Lihat pdf material 
     public function previewMaterial($id)
     {
         $material = Materi::query()->where('id', $id)->first();
@@ -546,6 +550,7 @@ public function courseDetail($id)
         return response()->file($filepath);
     }
 
+    //halaman download
     public function download($id = null)
     {
         if ($id) {
@@ -567,6 +572,7 @@ public function courseDetail($id)
         ]);
     }
 
+    // Halaman Profil yang dikunjungi pengguna
     public function publicProfile(Request $request, $id)
     {
         $profileUser = User::query()->where('id', $id)->first();
@@ -602,6 +608,7 @@ public function courseDetail($id)
         ]);
     }
 
+    // Mengambil data Pengunjung Profil Untuk Grafik
     public function getProfileVisitsData(Request $request)
     {
         $user = $this->getAuthenticatedUser();

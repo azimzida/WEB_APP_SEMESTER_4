@@ -141,64 +141,8 @@
                 <span class="text-2xl font-bold text-purple-900 tracking-tight">Edu Share</span>
             </div>
 
-            <div class="w-full max-w-xl mockup-monitor p-6">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-indigo-600 font-bold text-sm">🎓 Edu Share</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-slate-400 text-sm">
-                        <span>🔔</span>
-                        <div class="w-6 height-6 rounded-full bg-purple-200"></div>
-                    </div>
-                </div>
-
-                <div class="flex gap-6">
-                    <div class="w-1/4 space-y-2 hidden sm:block">
-                        <div class="sidebar-btn active">🏠 Home</div>
-                        <div class="sidebar-btn text-slate-500">👥 Course</div>
-                        <div class="sidebar-btn text-slate-500">📤 Upload</div>
-                        <div class="sidebar-btn text-slate-500">📥 Download</div>
-                    </div>
-
-                    <div class="w-full sm:w-3/4 space-y-4">
-                        <div>
-                            <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Popular Course</p>
-                            <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
-                                <div class="mini-card bg-purple-50 text-purple-700">
-                                    <div class="font-bold">JS</div>
-                                    <span class="text-[8px] text-slate-400">Javascript-Basics</span>
-                                </div>
-                                <div class="mini-card bg-orange-50 text-orange-700">
-                                    <div class="font-bold">UI/UX</div>
-                                    <span class="text-[8px] text-slate-400">UI/UX Design</span>
-                                </div>
-                                <div class="mini-card bg-teal-50 text-teal-700">
-                                    <div class="font-bold">DB</div>
-                                    <span class="text-[8px] text-slate-400">Database 101</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Recently Uploaded</p>
-                            <div class="space-y-2 text-[10px]">
-                                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
-                                    <span class="text-slate-600">📙 Programming Fundamentals.ppt</span>
-                                    <span class="text-indigo-600">📥</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
-                                    <span class="text-slate-600">📄 Web Design Guide.odt</span>
-                                    <span class="text-indigo-600">📥</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="absolute -bottom-8 -left-4 flex items-end justify-between w-full pointer-events-none px-4">
-                    <span class="text-5xl opacity-80">👩‍💻</span>
-                    <span class="text-5xl opacity-80">👨‍💻</span>
-                </div>
+            <div class="w-full max-w-xl relative z-10">
+                <img src="<?= asset('images/bg-card.png') ?>" alt="Edu Share Dashboard Mockup" class="w-full h-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300">
             </div>
         </div>
 

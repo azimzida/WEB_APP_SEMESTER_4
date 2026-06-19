@@ -12,6 +12,8 @@ $userName = $user['nama'] ?? null;
 @endphp
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+
     /* Background melengkung lembut khas layout Edu Share */
     .landing-bg {
         background-color: #FFFFFF;
@@ -72,10 +74,11 @@ $userName = $user['nama'] ?? null;
     }
 
     /* Warna Teks Judul Hero Utama */
+    /*Share Knowledge*/
     .hero-title-dark {
         color: #111827;
     }
-
+    /*Learn Together*/
     .hero-title-purple {
         color: #584B6B;
     }
@@ -118,6 +121,9 @@ $userName = $user['nama'] ?? null;
         background: #EBE6F8;
         opacity: 0.6;
         z-index: 0;
+    }
+    .font-family-lora {
+        font-family: "Lora", serif !important;
     }
 </style>
 
@@ -167,70 +173,8 @@ $userName = $user['nama'] ?? null;
                 <div class="bubble-decoration absolute top-[-50px] right-[40%] w-24 h-24" style="width: 100px; height: 100px;"></div>
                 <div class="bubble-decoration absolute bottom-[-40px] right-[10%] w-14 h-14" style="width: 50px; height: 50px;"></div>
 
-                <div class="w-full max-w-xl monitor-frame p-6 relative z-10">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-purple-800 font-bold text-sm">🎓 Edu Share</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-slate-400 text-sm">
-                            <span>🔔</span>
-                            <div class="w-6 h-6 rounded-full bg-purple-200"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-6">
-                        <div class="w-1/4 space-y-1 hidden sm:block">
-                            <div class="sidebar-item active">🏠 Home</div>
-                            <div class="sidebar-item text-slate-400">👥 Course</div>
-                            <div class="sidebar-item text-slate-400">📤 Upload</div>
-                            <div class="sidebar-item text-slate-400">📥 Download</div>
-                        </div>
-
-                        <div class="w-full sm:w-3/4 space-y-5">
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-800 uppercase tracking-wider mb-3">Popular Course</p>
-                                <div class="grid grid-cols-3 gap-3 text-center text-[10px]">
-                                    <div class="course-box bg-purple-50 text-purple-800 border-purple-100">
-                                        <div class="font-extrabold text-base mb-1">▶</div>
-                                        <span class="text-[9px] font-bold block">Javascript-Basics</span>
-                                    </div>
-                                    <div class="course-box bg-orange-50 text-orange-700 border-orange-100">
-                                        <div class="font-extrabold text-base mb-1">🎨</div>
-                                        <span class="text-[9px] font-bold block">UI/UX Design</span>
-                                    </div>
-                                    <div class="course-box bg-teal-50 text-teal-700 border-teal-100">
-                                        <div class="font-extrabold text-base mb-1">💾</div>
-                                        <span class="text-[9px] font-bold block">Database 101</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-800 uppercase tracking-wider mb-2">Recently Uploaded</p>
-                                <div class="space-y-2 text-[10px] font-semibold">
-                                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-orange-500">📄</span>
-                                            <span class="text-slate-600">Programming Fundamentals.ppt</span>
-                                        </div>
-                                        <span class="text-slate-400 cursor-pointer hover:text-slate-700">📥</span>
-                                    </div>
-                                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-blue-500">📄</span>
-                                            <span class="text-slate-600">Web Design Guide.odt</span>
-                                        </div>
-                                        <span class="text-slate-400 cursor-pointer hover:text-slate-700">📥</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="absolute -bottom-6 -left-6 flex items-end justify-between w-[108%] pointer-events-none px-4 z-20">
-                        <span class="text-6xl filter drop-shadow-md">👩‍💻</span>
-                        <span class="text-6xl filter drop-shadow-md" style="margin-bottom: -10px;">👨‍💻</span>
-                    </div>
+                <div class="w-full max-w-xl relative z-10">
+                    <img src="{{ asset('images/bg-card.png') }}" alt="Edu Share Dashboard Mockup" class="w-full h-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300">
                 </div>
             </div>
 

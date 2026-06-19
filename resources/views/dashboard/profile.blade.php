@@ -416,10 +416,10 @@ if (isset($courses) && is_iterable($courses)) {
     <div class="layout-body">
         <aside class="sidebar">
             <nav>
-                <a href="/dashboard">🏠 Home</a>
-                <a href="/home/courses">🗂️ Course</a>
-                <a href="/download">📥 Download</a>
-                <a href="/profile" class="active">👤 Profile</a>
+                <a href="/dashboard"><img src="{{ asset('images/icon_home_edushare.png') }}" alt="Home" class="w-5 h-5 object-contain"> Home</a>
+                <a href="/home/courses"><img src="{{ asset('images/icon_course_edushare.png') }}" alt="Course" class="w-5 h-5 object-contain"> Course</a>
+                <a href="/download"><img src="{{ asset('images/icon_download_edushare.png') }}" alt="Download" class="w-5 h-5 object-contain"> Download</a>
+                <a href="/profile" class="active"><img src="{{ asset('images/icon_profile_edushare.png') }}" alt="Profile" class="w-5 h-5 object-contain"> Profile</a>
             </nav>
 
             <div class="sidebar-footer">
@@ -433,7 +433,7 @@ if (isset($courses) && is_iterable($courses)) {
                     <h1>Edit Profile</h1>
                     <p>Update your account information and change your profile photo.</p>
                 </div>
-                <div class="hero-visual">👩‍💻</div>
+                <div class="hero-visual"><img src="{{ asset('images/icon_oranglaptop.png') }}" alt="Ilustrasi Edu Share" class="w-32 md:w-48 object-contain drop-shadow-md"></div>
             </div>
 
             @if(session()->has('success'))
@@ -511,7 +511,7 @@ if (isset($courses) && is_iterable($courses)) {
                     </div>
                 </form>
             </div>
-
+            {{-- Grafik --}}
             <div class="content-card" style="margin-top: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                     <h3 style="color: #2D2A43; font-size: 1.5rem; font-weight: 800; margin: 0;">Grafik Kunjungan Profil</h3>
